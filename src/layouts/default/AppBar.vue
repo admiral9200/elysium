@@ -13,7 +13,7 @@
     </v-btn>
     <v-menu>
         <template v-slot:activator="{ props }">
-            <v-btn icon="mdi-dots-vertical" v-bind="props"></v-btn>
+            <v-btn icon="mdi-account-circle" v-bind="props"></v-btn>
         </template>
 
         <v-list>
@@ -39,13 +39,18 @@ export default {
                 icon: "mdi-cart",
                 link: "/cart",
             },
-            {
-                text: "Profile",
-                icon: "mdi-account-circle",
-                link: "/profile",
-            },
         ];
         const menu = [{
+                text: "My Space",
+                icon: "mdi-space-invaders",
+                link: "/profile",
+            },
+            {
+                text: "Manage Wallet",
+                icon: "mdi-wallet",
+                link: "/wallet",
+            },
+            {
                 text: "Setting",
                 icon: "mdi-cog",
                 link: "/setting",
