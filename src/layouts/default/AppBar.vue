@@ -17,7 +17,7 @@
         </template>
 
         <v-list>
-            <v-list-item v-for="(item, i) in menu" :key="i" :prepend-icon="item.icon">
+            <v-list-item v-for="(item, i) in menu" :key="i" :prepend-icon="item.icon" :to="item.link" >
                 <v-list-item-title>{{ item.text }}</v-list-item-title>
             </v-list-item>
         </v-list>
@@ -43,7 +43,7 @@ export default {
         const menu = [{
                 text: "My Space",
                 icon: "mdi-space-invaders",
-                link: "/profile",
+                link: "/my-space",
             },
             {
                 text: "Manage Wallet",
