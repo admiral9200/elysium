@@ -16,7 +16,7 @@
             <v-btn icon="mdi-account-circle" v-bind="props"></v-btn>
         </template>
 
-        <v-list>
+        <v-list bg-color="background">
             <v-list-item v-for="(item, i) in menu" :key="i" :prepend-icon="item.icon" :to="item.link" >
                 <v-list-item-title>{{ item.text }}</v-list-item-title>
             </v-list-item>
