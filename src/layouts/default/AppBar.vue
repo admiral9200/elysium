@@ -1,7 +1,7 @@
 <template>
   <v-app-bar color="black">
     <v-app-bar-title class="font-weight-black text-h5">
-      <v-icon icon="mdi-circle-slice-4" />
+      <v-icon icon="mdi-alpha-e-box" size="50" />
       Elysium
     </v-app-bar-title>
 
