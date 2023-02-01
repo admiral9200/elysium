@@ -19,7 +19,9 @@
         <v-window-item :value="2">
           <OnSale />
         </v-window-item>
-        <v-window-item :value="3"> </v-window-item>
+        <v-window-item :value="3">
+          <Activity />
+        </v-window-item>
       </v-window>
     </v-card>
   </v-container>
@@ -30,6 +32,7 @@ import { ref } from "vue";
 import Profile from "@/components/mySpace/profile.vue";
 import OwnedNFT from "@/components/mySpace/ownedNFT.vue";
 import OnSale from "@/components/mySpace/onSale.vue";
+import Activity from "@/components/mySpace/activity.vue";
 
 export default {
   name: "MySpace",
@@ -37,6 +40,7 @@ export default {
     Profile,
     OwnedNFT,
     OnSale,
+    Activity,
   },
   setup() {
     var tab = ref(1);
