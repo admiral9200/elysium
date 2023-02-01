@@ -66,6 +66,11 @@ export default {
         link: "/my-space",
       },
       {
+        text: "Create NFT",
+        icon: "mdi-pencil-ruler",
+        link: "/create-nft",
+      },
+      {
         text: "Manage Wallet",
         icon: "mdi-wallet",
         link: "/wallet",

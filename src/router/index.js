@@ -16,6 +16,12 @@ const routes = [
         name: 'MySpace',
         component: () => import(/* webpackChunkName: "MySpace" */ '@/views/MySpace.vue'),
       },
+      {
+        path: '/create-nft',
+        name: 'CreateNFT',
+        component: () => import(/* webpackChunkName: "CreateNFT" */ '@/views/CreateNFT.vue'),
+      },
+
     ],
   },
 ]
