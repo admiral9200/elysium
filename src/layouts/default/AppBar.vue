@@ -22,6 +22,7 @@
       class="me-2"
       large
       :icon="item.icon"
+      :active="false"
     >
     </v-btn>
     <v-menu>
