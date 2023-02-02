@@ -15,16 +15,21 @@
     <v-spacer></v-spacer>
 
     <v-btn
-      color="white"
-      v-for="item in items"
-      :key="item"
-      :to="item.link"
+      to="/"
       class="me-2"
       large
-      :icon="item.icon"
+      icon="mdi-creation"
       :active="false"
-    >
-    </v-btn>
+    ></v-btn>
+
+    <v-btn
+      class="me-2"
+      large
+      icon="mdi-cart"
+      :active="false"
+      @click="$emit('onShowCart')"
+    ></v-btn>
+
     <v-menu>
       <template v-slot:activator="{ props }">
         <v-btn icon="mdi-account-circle" v-bind="props"></v-btn>
@@ -47,19 +52,8 @@
 <script>
 export default {
   name: "AppBar",
+  emits: ["onShowCart"],
   setup() {
-    const items = [
-      {
-        text: "Discover",
-        icon: "mdi-creation",
-        link: "/",
-      },
-      {
-        text: "Cart",
-        icon: "mdi-cart",
-        link: "/cart",
-      },
-    ];
     const menu = [
       {
         text: "My Space",
@@ -93,7 +87,6 @@ export default {
       },
     ];
     return {
-      items,
       menu,
     };
   },
