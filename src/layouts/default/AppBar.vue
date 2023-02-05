@@ -30,7 +30,18 @@
       @click="$emit('onShowCart')"
     ></v-btn>
 
-    <v-menu>
+    <v-btn
+      class="me-2"
+      large
+      rounded
+      color="white"
+      variant="outlined"
+      @click="connectMetamask()"
+      v-if="!isConnected"
+    >
+      Connect
+    </v-btn>
+    <v-menu v-else>
       <template v-slot:activator="{ props }">
         <v-btn icon="mdi-account-circle" v-bind="props"></v-btn>
       </template>
@@ -50,6 +61,8 @@
 </template>
 
 <script>
+import { ref, computed, onMounted } from "vue";
+import Web3 from "web3";
 export default {
   name: "AppBar",
   emits: ["onShowCart"],
@@ -86,8 +99,33 @@ export default {
         link: "/logout",
       },
     ];
+
+    const web3 = new Web3(Web3.givenProvider || "http://localhost:3000");
+    var accounts = ref([]);
+    const isConnected = ref(false);
+
+    onMounted(async () => {
+      if (window.ethereum) {
+        const _acc = await web3.eth.requestAccounts();
+        accounts = _acc.slice();
+        isConnected.value = true;
+      }
+    });
+
+    async function connectMetamask() {
+      try {
+        const _acc = await web3.eth.requestAccounts();
+        accounts = _acc.slice();
+        isConnected.value = true;
+      } catch (error) {
+        console.error(error);
+      }
+    }
     return {
       menu,
+      isConnected,
+      //function
+      connectMetamask,
     };
   },
 };
