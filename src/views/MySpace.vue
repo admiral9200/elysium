@@ -1,7 +1,7 @@
 <template>
-  <v-container fluid>
+  <v-container fluid v-if="userExist">
     <v-card class="mx-auto" color="background">
-      <profile />
+      <profile :user="user" />
       <v-tabs class="mt-10" v-model="tab" align-tabs="left">
         <v-tab :value="1">Owned</v-tab>
         <v-tab :value="2">On Sale</v-tab>
@@ -20,10 +20,21 @@
       </v-window>
     </v-card>
   </v-container>
+  <v-container
+    class="d-flex justify-center align-center"
+    style="height: 70vh"
+    v-else
+  >
+    <v-card class="mx-auto" color="background">
+      <v-card-title class="text-h4">User not found</v-card-title>
+    </v-card>
+  </v-container>
 </template>
 
 <script>
-import { ref } from "vue";
+import { ref, onMounted } from "vue";
+import axios from "axios";
+import { useRoute } from "vue-router";
 import Profile from "@/components/mySpace/profile.vue";
 import OwnedNFT from "@/components/mySpace/ownedNFT.vue";
 import OnSale from "@/components/mySpace/onSale.vue";
@@ -39,8 +50,25 @@ export default {
   },
   setup() {
     var tab = ref(1);
+    const route = useRoute();
+    const userExist = ref(true);
+
+    onMounted(async () => {
+      try {
+        const res = await axios.get("/api/user/" + route.params.address);
+        if (res.data === "User not found") {
+          userExist.value = false;
+        } else {
+          userExist.value = true;
+        }
+      } catch (error) {
+        console.error(error);
+      }
+    });
+
     return {
       tab,
+      userExist,
     };
   },
 };

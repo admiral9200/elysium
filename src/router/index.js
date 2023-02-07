@@ -1,27 +1,29 @@
 // Composables
-import { createRouter, createWebHistory } from 'vue-router'
+import { createRouter, createWebHistory } from "vue-router";
 
 const routes = [
   {
-    path: '',
-    name: 'Home',
-    component: () => import(/* webpackChunkName: "home" */ '@/views/Home.vue'),
+    path: "",
+    name: "Home",
+    component: () => import(/* webpackChunkName: "home" */ "@/views/Home.vue"),
   },
   {
-    path: '/my-space',
-    name: 'MySpace',
-    component: () => import(/* webpackChunkName: "MySpace" */ '@/views/MySpace.vue'),
+    path: "/user/:address",
+    name: "MySpace",
+    component: () =>
+      import(/* webpackChunkName: "MySpace" */ "@/views/MySpace.vue"),
   },
   {
-    path: '/create-nft',
-    name: 'CreateNFT',
-    component: () => import(/* webpackChunkName: "CreateNFT" */ '@/views/CreateNFT.vue'),
+    path: "/create-nft",
+    name: "CreateNFT",
+    component: () =>
+      import(/* webpackChunkName: "CreateNFT" */ "@/views/CreateNFT.vue"),
   },
-]
+];
 
 const router = createRouter({
   history: createWebHistory(process.env.BASE_URL),
   routes,
-})
+});
 
-export default router
+export default router;

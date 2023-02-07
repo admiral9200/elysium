@@ -1,9 +1,5 @@
 <template>
-  <v-img
-    height="60vh"
-    cover
-    src="https://cdn.vuetifyjs.com/images/cards/server-room.jpg"
-  ></v-img>
+  <v-img height="60vh" cover :src="background_url"></v-img>
   <v-row>
     <v-col
       class="text-center"
@@ -12,12 +8,9 @@
       style="position: relative; top: -5em; max-height: 150px"
     >
       <v-avatar class="mb-0 rounded-circle" color="grey" size="150">
-        <v-img
-          cover
-          src="https://cdn.vuetifyjs.com/images/profiles/marcus.jpg"
-        ></v-img>
+        <v-img cover :src="pfp_url"></v-img>
       </v-avatar>
-      <v-card-title>{{ name }}</v-card-title>
+      <v-card-title>@{{ username }}</v-card-title>
       <v-card-subtitle>{{ address }}</v-card-subtitle>
     </v-col>
     <v-col md="6" cols="12">
@@ -43,18 +36,49 @@
 </template>
 
 <script>
+import { ref, onMounted } from "vue";
+import axios from "axios";
+import { useRoute } from "vue-router";
 export default {
   name: "Profile",
   setup() {
-    const name = "Marcus Obrien";
-    const address = "0x2e8cf6a2a...87d3";
+    const route = useRoute();
+    const username = ref("");
+    const address = ref("");
+    const pfp_url = ref("");
+    const background_url = ref("");
     const ownedQty = 5;
     const followers = 10;
     const following = 20;
 
+    // onMounted async because it take time for the parent component to fetch data
+    onMounted(async () => {
+      try {
+        const res = await axios.get("/api/user/" + route.params.address);
+        if (res.data === "User not found") {
+          console.log("User not found");
+        } else {
+          username.value = res.data.username;
+          let original_address = res.data.address;
+          let truncated_address1 = original_address.substring(0, 5);
+          let truncated_address2 = original_address.substring(
+            original_address.length - 4,
+            original_address.length
+          );
+          address.value = truncated_address1 + "..." + truncated_address2;
+          pfp_url.value = res.data.profile_url;
+          background_url.value = res.data.background_url;
+        }
+      } catch (error) {
+        console.error(error);
+      }
+    });
+
     return {
-      name,
+      username,
       address,
+      pfp_url,
+      background_url,
       ownedQty,
       followers,
       following,

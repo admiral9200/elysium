@@ -82,7 +82,7 @@ export default {
       {
         text: "My Space",
         icon: "mdi-space-invaders",
-        link: "/my-space",
+        link: "/user/" + sessionStorage.getItem("address"),
       },
       {
         text: "Create NFT",
@@ -144,7 +144,7 @@ export default {
           emit("onSignUp", true);
         } else {
           // else, save user info to session storage
-          sessionStorage.setItem("pfp", res.data[0].profile_url);
+          sessionStorage.setItem("pfp", res.data.profile_url);
           pfp_url.value = sessionStorage.getItem("pfp");
           isConnected.value = true;
         }
