@@ -2,12 +2,7 @@
   <v-container fluid>
     <v-card class="mx-auto" color="background">
       <profile />
-      <v-tabs
-        class="mt-10"
-        v-model="tab"
-        color="deep-purple-accent-4"
-        align-tabs="left"
-      >
+      <v-tabs class="mt-10" v-model="tab" align-tabs="left">
         <v-tab :value="1">Owned</v-tab>
         <v-tab :value="2">On Sale</v-tab>
         <v-tab :value="3">Activity</v-tab>

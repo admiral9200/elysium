@@ -1,6 +1,5 @@
 <template>
   <v-img
-    class="d-flex align-end"
     height="60vh"
     cover
     src="https://cdn.vuetifyjs.com/images/cards/server-room.jpg"
