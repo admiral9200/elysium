@@ -5,7 +5,7 @@
       @onSignUp="(req) => (showSignUp = req)"
     />
 
-    <v-main class="pt-4">
+    <v-main>
       <router-view />
       <v-overlay
         v-model="showCart"
