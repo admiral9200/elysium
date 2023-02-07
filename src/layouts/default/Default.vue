@@ -1,6 +1,9 @@
 <template>
   <v-app>
-    <default-bar @onShowCart="() => (showCart = !showCart)" />
+    <default-bar
+      @onShowCart="() => (showCart = !showCart)"
+      @onSignUp="(req) => (showSignUp = req)"
+    />
 
     <v-main>
       <router-view />
@@ -11,6 +14,16 @@
       >
         <my-cart v-if="showCart" @onShowCart="() => (showCart = !showCart)" />
       </v-overlay>
+      <v-overlay
+        v-model="showSignUp"
+        location-strategy="connected"
+        class="d-flex justify-center"
+      >
+        <sign-up
+          v-if="showSignUp"
+          @onSignUp="() => (showSignUp = !showSignUp)"
+        />
+      </v-overlay>
     </v-main>
 
     <default-footer />
@@ -18,11 +31,11 @@
 </template>
 
 <script>
-import { ref, computed } from "vue";
+import { ref } from "vue";
 
 import DefaultBar from "./AppBar.vue";
 import DefaultFooter from "./Footer.vue";
-
+import SignUp from "@/views/SignUp.vue";
 import MyCart from "@/views/MyCart.vue";
 
 export default {
@@ -30,12 +43,15 @@ export default {
   components: {
     DefaultBar,
     DefaultFooter,
+    SignUp,
     MyCart,
   },
   setup() {
+    const showSignUp = ref(false);
     const showCart = ref(false);
 
     return {
+      showSignUp,
       showCart,
     };
   },

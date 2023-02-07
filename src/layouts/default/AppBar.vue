@@ -28,6 +28,7 @@
       icon="mdi-cart"
       :active="false"
       @click="$emit('onShowCart')"
+      v-if="isConnected"
     ></v-btn>
 
     <v-btn
@@ -43,7 +44,12 @@
     </v-btn>
     <v-menu v-else>
       <template v-slot:activator="{ props }">
-        <v-btn icon="mdi-account-circle" v-bind="props"></v-btn>
+        <v-btn v-bind="props"
+          ><img
+            style="width: 35px; border: 2px solid #fff; border-radius: 100%"
+            :src="pfp_url"
+          />
+        </v-btn>
       </template>
 
       <v-list bg-color="background">
@@ -55,18 +61,24 @@
         >
           <v-list-item-title>{{ item.text }}</v-list-item-title>
         </v-list-item>
+        <v-list-item color="red" prepend-icon="mdi-logout" @click="logout()"
+          >Logout</v-list-item
+        >
       </v-list>
     </v-menu>
   </v-app-bar>
+  <h1>{{ pfp_url }}</h1>
 </template>
 
 <script>
-import { ref, computed, onMounted } from "vue";
+import { ref, onMounted } from "vue";
 import Web3 from "web3";
+import axios from "axios";
+
 export default {
   name: "AppBar",
-  emits: ["onShowCart"],
-  setup() {
+  emits: ["onShowCart", "onSignUp"],
+  setup(props, { emit }) {
     const menu = [
       {
         text: "My Space",
@@ -93,39 +105,67 @@ export default {
         icon: "mdi-help",
         link: "/help",
       },
-      {
-        text: "Logout",
-        icon: "mdi-logout",
-        link: "/logout",
-      },
     ];
 
     const web3 = new Web3(Web3.givenProvider || "http://localhost:3000");
-    var accounts = ref([]);
+    var address = ref([]);
+    var pfp_url = ref("");
     const isConnected = ref(false);
 
     onMounted(async () => {
-      if (window.ethereum) {
-        const _acc = await web3.eth.requestAccounts();
-        accounts = _acc.slice();
+      //check if user has logged in
+      if (sessionStorage.getItem("address")) {
+        pfp_url.value = sessionStorage.getItem("pfp");
         isConnected.value = true;
       }
+      // if (window.ethereum) {
+      //   const _acc = await web3.eth.requestAccounts();
+      //   accounts = _acc.slice();
+      //   isConnected.value = true;
+      // }
     });
 
-    async function connectMetamask() {
+    const connectMetamask = async () => {
       try {
         const _acc = await web3.eth.requestAccounts();
-        accounts = _acc.slice();
-        isConnected.value = true;
+        address = _acc.slice();
+        sessionStorage.setItem("address", address);
+        login();
       } catch (error) {
         console.error(error);
       }
-    }
+    };
+
+    const login = async () => {
+      //check if user previously signed up
+      try {
+        const res = await axios.get("/api/user/" + address);
+        //if not, show sign up page
+        if (res.data === "User not found") {
+          emit("onSignUp", true);
+        } else {
+          // else, save user info to session storage
+          sessionStorage.setItem("pfp", res.data[0].profile_url);
+          pfp_url.value = sessionStorage.getItem("pfp");
+          isConnected.value = true;
+        }
+      } catch (error) {
+        console.error(error);
+      }
+    };
+
+    const logout = () => {
+      sessionStorage.clear();
+      isConnected.value = false;
+    };
+
     return {
       menu,
       isConnected,
+      pfp_url,
       //function
       connectMetamask,
+      logout,
     };
   },
 };
