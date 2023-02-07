@@ -67,7 +67,6 @@
       </v-list>
     </v-menu>
   </v-app-bar>
-  <h1>{{ pfp_url }}</h1>
 </template>
 
 <script>
