@@ -1,7 +1,7 @@
 <template>
   <v-container fluid v-if="userExist">
     <v-card class="mx-auto" color="background">
-      <profile :user="user" />
+      <profile />
       <v-tabs class="mt-10" v-model="tab" align-tabs="left">
         <v-tab :value="1">Owned</v-tab>
         <v-tab :value="2">On Sale</v-tab>
