@@ -73,6 +73,7 @@
 import { ref, onMounted } from "vue";
 import Web3 from "web3";
 import axios from "axios";
+import { useRouter } from "vue-router";
 
 export default {
   name: "AppBar",
@@ -110,6 +111,7 @@ export default {
     var address = ref([]);
     var pfp_url = ref("");
     const isConnected = ref(false);
+    const router = useRouter();
 
     onMounted(async () => {
       //check if user has logged in
@@ -156,6 +158,7 @@ export default {
     const logout = () => {
       sessionStorage.clear();
       isConnected.value = false;
+      router.push("/");
     };
 
     return {
