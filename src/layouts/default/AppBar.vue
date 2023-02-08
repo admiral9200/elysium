@@ -108,7 +108,7 @@ export default {
     ];
 
     const web3 = new Web3(Web3.givenProvider || "http://localhost:3000");
-    var address = ref([]);
+    const address = ref([]);
     var pfp_url = ref("");
     const isConnected = ref(false);
     const router = useRouter();
@@ -129,8 +129,8 @@ export default {
     const connectMetamask = async () => {
       try {
         const _acc = await web3.eth.requestAccounts();
-        address = _acc.slice();
-        sessionStorage.setItem("address", address);
+        address.value = _acc.slice();
+        sessionStorage.setItem("address", address.value[0]);
         login();
       } catch (error) {
         console.error(error);
@@ -140,7 +140,7 @@ export default {
     const login = async () => {
       //check if user previously signed up
       try {
-        const res = await axios.get("/api/user/" + address);
+        const res = await axios.get("/api/user/" + address.value[0]);
         //if not, show sign up page
         if (res.data === "User not found") {
           emit("onSignUp", true);
