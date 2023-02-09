@@ -1,5 +1,24 @@
 <template>
-  <v-img height="60vh" cover :src="background_url"></v-img>
+  <v-hover v-slot="{ isHovering, props }">
+    <v-img
+      width="100%"
+      height="60vh"
+      cover
+      :class="{ 'on-hover': isHovering }"
+      :src="user.background_url"
+      v-bind="props"
+    >
+      <div class="d-flex justify-end">
+        <v-btn
+          variant="text"
+          :class="{ 'show-btns': isHovering }"
+          color="rgba(255, 255, 255, 0)"
+          icon="mdi-image-edit"
+          v-if="canEdit"
+        ></v-btn>
+      </div>
+    </v-img>
+  </v-hover>
   <v-row>
     <v-col
       class="text-center"
@@ -7,10 +26,32 @@
       cols="12"
       style="position: relative; top: -5em; max-height: 150px"
     >
-      <v-avatar class="mb-0 rounded-circle" color="grey" size="150">
-        <v-img cover :src="pfp_url"></v-img>
-      </v-avatar>
-      <v-card-title>@{{ username }}</v-card-title>
+      <v-hover v-slot="{ isHovering, props }">
+        <v-avatar
+          class="mb-0 rounded-circle"
+          color="grey"
+          size="150"
+          style="border: 3px solid #fff; border-radius: 100%"
+          v-bind="props"
+        >
+          <v-img
+            cover
+            :src="user.profile_url"
+            :class="{ 'on-hover': isHovering }"
+            class="d-flex align-center"
+          >
+            <v-btn
+              variant="text"
+              :class="{ 'show-btns': isHovering }"
+              color="rgba(255, 255, 255, 0)"
+              icon="mdi-camera"
+              v-if="canEdit"
+              @click="() => (showUploadProfile = !showUploadProfile)"
+            ></v-btn>
+          </v-img>
+        </v-avatar>
+      </v-hover>
+      <v-card-title>@{{ user.username }}</v-card-title>
       <v-card-subtitle>{{ address }}</v-card-subtitle>
     </v-col>
     <v-col md="6" cols="12">
@@ -30,26 +71,52 @@
       </v-row>
     </v-col>
     <v-col class="d-flex justify-center align-center" lg="2" md="2" cols="12">
-      <v-btn class="mx-2" width="80%">Follow</v-btn>
+      <v-btn
+        class="mx-2"
+        width="80%"
+        color="primary"
+        variant="outlined"
+        v-if="canEdit"
+        @click="() => (showEditProfile = !showEditProfile)"
+      >
+        Edit Profile
+      </v-btn>
+      <v-btn class="mx-2" width="80%" color="white" v-else>Follow</v-btn>
     </v-col>
   </v-row>
+  <v-overlay
+    v-model="showEditProfile"
+    location-strategy="connected"
+    class="d-flex justify-center align-center"
+  >
+    <edit-profile
+      :user="user"
+      v-if="showEditProfile"
+      @onEdit="() => (showEditProfile = !showEditProfile)"
+    />
+  </v-overlay>
 </template>
 
 <script>
-import { ref, onMounted } from "vue";
+import { ref, computed, onMounted } from "vue";
 import axios from "axios";
 import { useRoute } from "vue-router";
+import EditProfile from "@/components/mySpace/editProfile.vue";
+
 export default {
   name: "Profile",
+  components: {
+    EditProfile,
+    changeProfilePic,
+  },
   setup() {
     const route = useRoute();
-    const username = ref("");
+    const user = ref({});
     const address = ref("");
-    const pfp_url = ref("");
-    const background_url = ref("");
     const ownedQty = 5;
     const followers = 10;
     const following = 20;
+    const showEditProfile = ref(false);
 
     // onMounted async because it take time for the parent component to fetch data
     onMounted(async () => {
@@ -58,7 +125,7 @@ export default {
         if (res.data === "User not found") {
           console.log("User not found");
         } else {
-          username.value = res.data.username;
+          user.value = res.data;
           let original_address = res.data.address;
           let truncated_address1 = original_address.substring(0, 5);
           let truncated_address2 = original_address.substring(
@@ -66,23 +133,34 @@ export default {
             original_address.length
           );
           address.value = truncated_address1 + "..." + truncated_address2;
-          pfp_url.value = res.data.profile_url;
-          background_url.value = res.data.background_url;
         }
       } catch (error) {
         console.error(error);
       }
     });
 
+    const canEdit = computed(() => {
+      return route.params.address === sessionStorage.getItem("address");
+    });
+
     return {
-      username,
+      user,
       address,
-      pfp_url,
-      background_url,
       ownedQty,
       followers,
       following,
+      showEditProfile,
+      canEdit,
     };
   },
 };
 </script>
+<style scoped>
+.on-hover {
+  opacity: 0.6;
+}
+
+.show-btns {
+  color: rgba(255, 255, 255, 1) !important;
+}
+</style>
