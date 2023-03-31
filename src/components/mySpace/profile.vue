@@ -95,6 +95,16 @@
       @onEdit="() => (showEditProfile = !showEditProfile)"
     />
   </v-overlay>
+  <v-overlay
+    v-model="showUploadProfile"
+    location-strategy="connected"
+    class="d-flex justify-center align-center"
+  >
+    <change-profile-pic
+      v-if="showUploadProfile"
+      @onEdit="() => (showUploadProfile = !showUploadProfile)"
+    />
+  </v-overlay>
 </template>
 
 <script>
@@ -102,6 +112,7 @@ import { ref, computed, onMounted } from "vue";
 import axios from "axios";
 import { useRoute } from "vue-router";
 import EditProfile from "@/components/mySpace/editProfile.vue";
+import changeProfilePic from "@/components/mySpace/changeProfilePic.vue";
 
 export default {
   name: "Profile",
@@ -117,6 +128,7 @@ export default {
     const followers = 10;
     const following = 20;
     const showEditProfile = ref(false);
+    const showUploadProfile = ref(false);
 
     // onMounted async because it take time for the parent component to fetch data
     onMounted(async () => {
@@ -150,6 +162,7 @@ export default {
       followers,
       following,
       showEditProfile,
+      showUploadProfile,
       canEdit,
     };
   },
