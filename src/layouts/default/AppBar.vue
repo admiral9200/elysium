@@ -74,12 +74,14 @@ import { ref, onMounted } from "vue";
 import { useRouter } from "vue-router";
 import axios from "axios";
 import { useMarketStore } from "@/stores/market";
+import { storeToRefs } from "pinia";
 
 export default {
   name: "AppBar",
   emits: ["onShowCart", "onSignUp"],
   setup(props, { emit }) {
-    const store = useMarketStore();
+    const marketStore = useMarketStore();
+    const { account } = storeToRefs(marketStore);
 
     const menu = [
       {
@@ -114,6 +116,7 @@ export default {
     const router = useRouter();
 
     onMounted(async () => {
+      console.log(account.value);
       //check if user has logged in
       if (sessionStorage.getItem("pfp")) {
         pfp_url.value = sessionStorage.getItem("pfp");
@@ -126,18 +129,18 @@ export default {
       // }
     });
 
-    async function login() {
+    const login = async () => {
       //connect wallet
-      await store.connectWallet();
+      await marketStore.connectWallet();
       //check if user previously signed up
       try {
-        const res = await axios.get("/api/user/" + store.account);
+        const res = await axios.get("/api/user/" + account.value);
         //if not, show sign up page
         if (res.data === "User not found") {
           emit("onSignUp", true);
         } else {
           // else, save user info to session storage
-          sessionStorage.setItem("address", store.account);
+          sessionStorage.setItem("address", account.value);
           sessionStorage.setItem("pfp", res.data.profile_url);
           pfp_url.value = sessionStorage.getItem("pfp");
           isConnected.value = true;
@@ -145,7 +148,7 @@ export default {
       } catch (error) {
         console.error(error);
       }
-    }
+    };
 
     function logout() {
       sessionStorage.clear();

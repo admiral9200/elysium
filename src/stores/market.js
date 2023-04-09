@@ -197,7 +197,7 @@ export const useMarketStore = defineStore("user", () => {
     loading,
     // wave,
     connectWallet,
-    // account,
+    account,
     // guestPosts,
     // guestPostsCount,
   };
