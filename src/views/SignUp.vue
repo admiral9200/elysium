@@ -66,7 +66,7 @@ export default {
     const desc = ref("");
     const email = ref("");
 
-    async function submit() {
+    const submit = async () => {
       const data = {
         username: username.value,
         address: store.account,
@@ -80,7 +80,7 @@ export default {
         console.log(res.data);
         emit("onSignUp", false);
       }
-    }
+    };
 
     return {
       username,
