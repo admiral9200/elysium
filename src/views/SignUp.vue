@@ -55,10 +55,13 @@
 <script>
 import { ref, computed } from "vue";
 import axios from "axios";
+import { useMarketStore } from "@/stores/market";
+
 export default {
   name: "SignUp",
   emits: ["onSignUp"],
   setup(props, { emit }) {
+    const store = useMarketStore();
     const username = ref("");
     const desc = ref("");
     const email = ref("");
@@ -66,7 +69,7 @@ export default {
     async function submit() {
       const data = {
         username: username.value,
-        address: sessionStorage.getItem("address"),
+        address: store.account,
         email: email.value,
         profile_url: "https://source.boringavatars.com/pixel/250",
         background_url: "https://source.boringavatars.com/pixel/250",

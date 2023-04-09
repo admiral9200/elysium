@@ -37,7 +37,7 @@
       rounded
       color="white"
       variant="outlined"
-      @click="connectMetamask()"
+      @click="login()"
       v-if="!isConnected"
     >
       Connect
@@ -71,14 +71,16 @@
 
 <script>
 import { ref, onMounted } from "vue";
-import Web3 from "web3";
-import axios from "axios";
 import { useRouter } from "vue-router";
+import axios from "axios";
+import { useMarketStore } from "@/stores/market";
 
 export default {
   name: "AppBar",
   emits: ["onShowCart", "onSignUp"],
   setup(props, { emit }) {
+    const store = useMarketStore();
+
     const menu = [
       {
         text: "My Space",
@@ -107,15 +109,13 @@ export default {
       },
     ];
 
-    const web3 = new Web3(Web3.givenProvider || "http://localhost:3000");
-    const address = ref([]);
     var pfp_url = ref("");
     const isConnected = ref(false);
     const router = useRouter();
 
     onMounted(async () => {
       //check if user has logged in
-      if (sessionStorage.getItem("address")) {
+      if (sessionStorage.getItem("pfp")) {
         pfp_url.value = sessionStorage.getItem("pfp");
         isConnected.value = true;
       }
@@ -126,26 +126,18 @@ export default {
       // }
     });
 
-    const connectMetamask = async () => {
-      try {
-        const _acc = await web3.eth.requestAccounts();
-        address.value = _acc.slice();
-        sessionStorage.setItem("address", address.value[0]);
-        login();
-      } catch (error) {
-        console.error(error);
-      }
-    };
-
-    const login = async () => {
+    async function login() {
+      //connect wallet
+      await store.connectWallet();
       //check if user previously signed up
       try {
-        const res = await axios.get("/api/user/" + address.value[0]);
+        const res = await axios.get("/api/user/" + store.account);
         //if not, show sign up page
         if (res.data === "User not found") {
           emit("onSignUp", true);
         } else {
           // else, save user info to session storage
+          sessionStorage.setItem("address", store.account);
           sessionStorage.setItem("pfp", res.data.profile_url);
           pfp_url.value = sessionStorage.getItem("pfp");
           isConnected.value = true;
@@ -153,20 +145,31 @@ export default {
       } catch (error) {
         console.error(error);
       }
-    };
+    }
 
-    const logout = () => {
+    function logout() {
       sessionStorage.clear();
       isConnected.value = false;
       router.push("/");
-    };
+    }
+
+    // const connectMetamask = async () => {
+    //   try {
+    //     const _acc = await web3.eth.requestAccounts();
+    //     address.value = _acc.slice();
+    //     sessionStorage.setItem("address", address.value[0]);
+    //     login();
+    //   } catch (error) {
+    //     console.error(error);
+    //   }
+    // };
 
     return {
       menu,
       isConnected,
       pfp_url,
       //function
-      connectMetamask,
+      login,
       logout,
     };
   },
