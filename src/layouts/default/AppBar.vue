@@ -97,17 +97,20 @@ export default {
       {
         text: "Manage Wallet",
         icon: "mdi-wallet",
-        link: "/wallet",
+        // link: "/wallet",
+        link: "/",
       },
       {
         text: "Setting",
         icon: "mdi-cog",
-        link: "/setting",
+        // link: "/setting",
+        link: "/",
       },
       {
         text: "Help",
         icon: "mdi-help",
-        link: "/help",
+        // link: "/help",
+        link: "/",
       },
     ];
 
@@ -152,6 +155,7 @@ export default {
 
     function logout() {
       sessionStorage.clear();
+      //TODO clear account.value in pinia and disconnect wallet
       isConnected.value = false;
       router.push("/");
     }
