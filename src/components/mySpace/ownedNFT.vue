@@ -9,7 +9,6 @@
           single-line
           clear-icon="mdi-close-circle"
           clearable
-          @click:clear="clearMessage"
           density="compact"
           variant="outlined"
           class="ms-4"
