@@ -108,10 +108,8 @@
         <p class="mt-2">
           You can buy NFTs from the marketplace or create your own NFTs
         </p>
-        <v-btn color="accent" variant="contained" class="mt-4"> Buy NFT </v-btn>
-        <v-btn color="accent" variant="contained" class="mt-4">
-          Create NFT
-        </v-btn>
+        <v-btn color="accent" variant="text" class="mt-4"> Buy NFT </v-btn>
+        <v-btn color="accent" variant="text" class="mt-4"> Create NFT </v-btn>
       </v-col>
     </v-row>
   </v-container>
@@ -139,26 +137,26 @@ export default {
 
     const ownedNFTs = ref([]);
 
-    onMounted(async () => {
-      const res = await getMyNFTs();
-      console.log(res);
-      if (res) {
-        ownedNFTs.value = await Promise.all(
-          res.map(async (i) => {
-            let nft = {
-              seller: i.seller,
-              owner: i.owner,
-              price: i.price,
-              tokenUri: i.tokenUri,
-              name: i.tokenName,
-              desc: i.tokenDescription,
-              royalty: i.tokenRoyalty,
-            };
-            return nft;
-          })
-        );
-      }
-    });
+    // onMounted(async () => {
+    //   const res = await getMyNFTs();
+    //   console.log(res);
+    //   if (res) {
+    //     ownedNFTs.value = await Promise.all(
+    //       res.map(async (i) => {
+    //         let nft = {
+    //           seller: i.seller,
+    //           owner: i.owner,
+    //           price: i.price,
+    //           tokenUri: i.tokenUri,
+    //           name: i.tokenName,
+    //           desc: i.tokenDescription,
+    //           royalty: i.tokenRoyalty,
+    //         };
+    //         return nft;
+    //       })
+    //     );
+    //   }
+    // });
 
     return {
       menu,
