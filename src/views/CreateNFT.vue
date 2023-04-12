@@ -4,7 +4,7 @@
       <v-col md="8" cols="12">
         <v-card variant="outlined" theme="dark">
           <v-card-title class="text-white"> Create New NFT</v-card-title>
-          <v-form ref="form" v-model="valid" lazy-validation>
+          <v-form @submit.prevent>
             <v-card-text>
               <v-text-field
                 v-model="wallet"
@@ -121,11 +121,13 @@
 
 <script>
 import { ref, computed } from "vue";
+import { useMarketStore } from "@/stores/market";
 
 export default {
   name: "CreateNFT",
   components: {},
   setup() {
+    const { uploadFileToIPFS, uploadJSONToIPFS, mintNFT } = useMarketStore();
     // data
     const valid = ref(false);
     const name = ref("");
@@ -142,6 +144,30 @@ export default {
       return "";
     });
 
+    const submit = async () => {
+      // if (valid.value) {
+      const fileData = await uploadFileToIPFS(file.value[0]);
+      console.log(fileData.IpfsHash);
+      const json = {
+        name: name.value,
+        description: description.value,
+        image: fileData.IpfsHash,
+        loyalty: loyalty.value,
+      };
+      const jsonFile = await uploadJSONToIPFS(json);
+      console.log(jsonFile.IpfsHash);
+      const mint = await mintNFT(jsonFile.IpfsHash, price.value.toString());
+
+      // const mint = await mintNFT(
+      //   "QmRaWcj4SsKuYyaemp7upnjHxk44AtC13JBvzwGH3YbJzc",
+      //   "1"
+      // );
+
+      console.log(mint);
+      //   console.log("submit");
+      // }
+    };
+
     return {
       valid,
       name,
@@ -152,6 +178,7 @@ export default {
       freeMint,
       file,
       previewImg,
+      submit,
     };
   },
 };

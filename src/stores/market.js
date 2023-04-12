@@ -1,17 +1,23 @@
 import { ethers } from "ethers";
 import { acceptHMRUpdate, defineStore } from "pinia";
 import contractABI from "../artifacts/contractABI/NFTMarketplace.json";
-const contractAddress = "0x7544C84Aa181aE68141C624a2b8e1BF80eD90493";
-
 import { ref } from "vue";
+import axios from "axios";
+
+const contractAddress = import.meta.env.VITE_CONTRACT_ADDRESS;
+const apiKey = import.meta.env.VITE_PINATA_API_KEY;
+const apiSecret = import.meta.env.VITE_PINATA_API_SECRET;
 
 export const useMarketStore = defineStore("user", () => {
   const account = ref(null);
-  const guestPosts = ref([]);
   const loading = ref(false);
-  const guestPostsCount = ref(0);
 
-  async function connectWallet() {
+  // function setLoader(boolean) {
+  //   console.log("setloader", value);
+  //   loading.value = value;
+  // }
+
+  const connectWallet = async () => {
     try {
       const { ethereum } = window;
       if (!ethereum) {
@@ -23,183 +29,177 @@ export const useMarketStore = defineStore("user", () => {
       });
       console.log("Connected: ", myAccounts[0]);
       account.value = myAccounts[0];
-      // await getWaveCount();
-      // await getAllWaves();
-      // await getBalance();
     } catch (error) {
       console.log(error);
     }
-  }
+  };
 
-  // async function getBalance() {
-  //   setLoader(true);
-  //   try {
-  //     const { ethereum } = window;
-  //     if (ethereum) {
-  //       const provider = new ethers.providers.Web3Provider(ethereum);
-  //       const signer = provider.getSigner();
-  //       const marketContract = new ethers.Contract(
-  //         contractAddress,
-  //         contractABI.abi,
-  //         signer
-  //       );
-  //       const count = await marketContract.getBalance();
-  //       const amt = ethers.utils.formatEther(count);
-  //       console.log("count", amt);
-  //       setLoader(false);
-  //     }
-  //   } catch (e) {
-  //     setLoader(false);
-  //     console.log("e", e);
-  //   }
-  // }
+  const uploadFileToIPFS = async (file) => {
+    const formData = new FormData();
+    formData.append("file", file);
 
-  // async function wave(messageInput) {
-  //   console.log("setting loader");
-  //   setLoader(true);
-  //   try {
-  //     console.log("got", messageInput);
-  //     const { ethereum } = window;
-  //     if (ethereum) {
-  //       // create provider object from ethers library, using ethereum object injected by metamask
-  //       const provider = new ethers.providers.Web3Provider(ethereum);
-  //       const signer = provider.getSigner();
-  //       const marketContract = new ethers.Contract(
-  //         contractAddress,
-  //         contractABI.abi,
-  //         signer
-  //       );
-  //       marketContract.on("PrizeMoneySent", (receiver, amount) => {
-  //         console.log("prize won! %s received ", receiver, amount.toNumber());
-  //       });
+    const res = await axios.post(
+      "https://api.pinata.cloud/pinning/pinFileToIPFS",
+      formData,
+      {
+        headers: {
+          "Content-Type": "multipart/form-data",
+          pinata_api_key: apiKey,
+          pinata_secret_api_key: apiSecret,
+        },
+      }
+    );
 
-  //       const overrides = {
-  //         value: ethers.utils.parseEther(".05"), // sending one ether
-  //         gasLimit: 200000, // optional
-  //       };
+    return res.data;
+  };
 
-  //       /*
-  //        * Execute the actual wave from your smart contract
-  //        */
-  //       const waveTxn = await marketContract.wave(messageInput, overrides);
-  //       console.log("Mining...", waveTxn.hash);
-  //       await waveTxn.wait();
-  //       console.log("Mined -- ", waveTxn.hash);
+  const uploadJSONToIPFS = async (json) => {
+    const res = await axios.post(
+      "https://api.pinata.cloud/pinning/pinJSONToIPFS",
+      json,
+      {
+        headers: {
+          pinata_api_key: apiKey,
+          pinata_secret_api_key: apiSecret,
+        },
+      }
+    );
+    return res.data;
+  };
 
-  //       const count = (await marketContract.totalWaveCount()).toNumber();
-  //       console.log("count", count);
-  //       messageInput = "";
-  //       setLoader(false);
-  //     } else {
-  //       console.log("Ethereum object doesn't exist!");
-  //     }
-  //   } catch (error) {
-  //     setLoader(false);
-  //     console.log(error);
-  //   }
-  // }
+  const mintNFT = async (tokenURI, price) => {
+    try {
+      if (window.ethereum != null) {
+        // create provider object from ethers library, using ethereum object injected by metamask
+        const provider = new ethers.BrowserProvider(window.ethereum);
+        const signer = await provider.getSigner();
+        const marketContract = new ethers.Contract(
+          contractAddress,
+          contractABI.abi,
+          signer
+        );
+        const listingPrice = await marketContract.getListingPrice();
+        const overrides = {
+          value: listingPrice,
+        }; //use to pay the listing price
+        const tokenTxn = await marketContract.createToken(
+          tokenURI,
+          ethers.parseUnits(price, "ether"),
+          overrides
+        );
+        return await tokenTxn.wait();
+      } else {
+        console.log("Ethereum object doesn't exist!");
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
-  // async function getAllWaves() {
-  //   try {
-  //     // setLoading(true);
-  //     const { ethereum } = window;
-  //     if (ethereum) {
-  //       const provider = new ethers.providers.Web3Provider(ethereum);
-  //       const signer = provider.getSigner();
-  //       const marketContract = new ethers.Contract(
-  //         contractAddress,
-  //         contractABI.abi,
-  //         signer
-  //       );
+  const getMyNFTs = async () => {
+    try {
+      const { ethereum } = window;
+      if (ethereum) {
+        // create provider object from ethers library, using ethereum object injected by metamask
+        const provider = new ethers.BrowserProvider(ethereum);
+        const signer = await provider.getSigner();
+        const marketContract = new ethers.Contract(
+          contractAddress,
+          contractABI.abi,
+          signer
+        );
+        const res = await marketContract.fetchMyNFTs();
+        if (res.length > 0) {
+          const nfts = await Promise.all(
+            res.map(async (i) => {
+              const tokenHash = await marketContract.tokenURI(i.tokenId);
+              const meta = await getTokenMeta(tokenHash);
+              const imgHash = meta.image;
+              let price = ethers.formatUnits(i.price.toString(), "ether");
+              let nft = {
+                seller: i.seller,
+                owner: i.owner,
+                price,
+                tokenUri: "https://ipfs.io/ipfs/" + imgHash,
+                tokenName: meta.name,
+                tokenDescription: meta.description,
+                tokenRoyalty: meta.royalty,
+              };
+              return nft;
+            })
+          );
+          return nfts;
+        } else return null;
+      } else {
+        console.log("Ethereum object doesn't exist!");
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
-  //       const waves = await marketContract.getAllWaves();
+  const getListedNFTs = async () => {
+    try {
+      const { ethereum } = window;
+      if (ethereum) {
+        // create provider object from ethers library, using ethereum object injected by metamask
+        const provider = new ethers.BrowserProvider(ethereum);
+        const signer = await provider.getSigner();
+        const marketContract = new ethers.Contract(
+          contractAddress,
+          contractABI.abi,
+          signer
+        );
+        const res = await marketContract.fetchItemsListed();
+        if (res.length > 0) {
+          const nfts = await Promise.all(
+            res.map(async (i) => {
+              const tokenHash = await marketContract.tokenURI(i.tokenId);
+              const meta = await getTokenMeta(tokenHash);
+              const imgHash = meta.image;
+              let price = ethers.formatUnits(i.price.toString(), "ether");
+              let nft = {
+                seller: i.seller,
+                owner: i.owner,
+                price,
+                tokenUri: "https://ipfs.io/ipfs/" + imgHash,
+                tokenName: meta.name,
+                tokenDescription: meta.description,
+                tokenRoyalty: meta.royalty,
+              };
+              return nft;
+            })
+          );
+          return nfts;
+        } else return null;
+      } else {
+        console.log("Ethereum object doesn't exist!");
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
-  //       /*
-  //        * We only need address, timestamp, and message in our UI so let's
-  //        * pick those out
-  //        */
-  //       const wavesCleaned = [];
-  //       waves.forEach((wave) => {
-  //         const waveTime = new Date(wave.timestamp * 1000);
-  //         // const waveTimeFormatted = moment(waveTime).format('llll')
-  //         // DateTime.fromFormat(waveTime, 'MM-dd-yyyy').toJSDate();
-  //         const waveTimeFormatted = new Intl.DateTimeFormat("en-US").format(
-  //           waveTime
-  //         );
-
-  //         wavesCleaned.push({
-  //           address: wave.waver,
-  //           timestamp: waveTimeFormatted,
-  //           message: wave.message,
-  //         });
-  //       });
-
-  //       // setAllWaves(wavesCleaned)
-  //       guestPosts.value = wavesCleaned;
-
-  //       marketContract.on("NewWave", (from, message, timestamp) => {
-  //         console.log("NewWave", from, timestamp, message);
-  //         const waveTime = new Date(timestamp * 1000);
-  //         // const waveTimeFormatted = moment(waveTime).format('llll')
-  //         const waveTimeFormatted = new Intl.DateTimeFormat("en-US").format(
-  //           waveTime
-  //         );
-  //         guestPosts.value = [
-  //           ...guestPosts.value,
-  //           {
-  //             address: from,
-  //             timestamp: waveTimeFormatted,
-  //             message,
-  //           },
-  //         ];
-  //       });
-  //     } else {
-  //       console.log("Ethereum object doesn't exist!");
-  //     }
-  //     // setLoading(false)
-  //   } catch (error) {
-  //     console.log(error);
-  //   }
-  // }
-
-  // async function getWaveCount() {
-  //   try {
-  //     const { ethereum } = window;
-  //     if (ethereum) {
-  //       // create provider object from ethers library, using ethereum object injected by metamask
-  //       const provider = new ethers.providers.Web3Provider(ethereum);
-  //       const signer = provider.getSigner();
-
-  //       const marketContract = new ethers.Contract(
-  //         contractAddress,
-  //         contractABI.abi,
-  //         signer
-  //       );
-  //       const count = await marketContract.totalWaveCount();
-  //       console.log("Retrieved total wave count...", count);
-  //       guestPostsCount.value = count;
-  //     } else {
-  //       console.log("Ethereum object doesn't exist!");
-  //     }
-  //     // setLoading(false)
-  //   } catch (error) {
-  //     console.log(error);
-  //   }
-  // }
-
-  // function setLoader(boolean) {
-  //   console.log("setloader", value);
-  //   loading.value = value;
-  // }
+  const getTokenMeta = async (tokenHash) => {
+    try {
+      const res = await axios.get("https://ipfs.io/ipfs/" + tokenHash);
+      return res.data;
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
   return {
+    account,
     // setLoader,
     loading,
-    // wave,
+    // market,
     connectWallet,
-    account,
-    // guestPosts,
-    // guestPostsCount,
+    uploadFileToIPFS,
+    uploadJSONToIPFS,
+    mintNFT,
+    getMyNFTs,
+    getListedNFTs,
   };
 });
 

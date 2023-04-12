@@ -64,10 +64,10 @@
             </tr>
           </thead>
           <tbody>
-            <tr v-for="item in ownedNFTs" :key="item.address">
-              <td><v-img height="80" :src="item.image"></v-img></td>
+            <tr v-for="item in ownedNFTs" :key="item.tokenUri">
+              <td><v-img height="80" :src="item.tokenUri"></v-img></td>
               <td>{{ item.name }}</td>
-              <td>{{ item.address }}</td>
+              <td>{{ item.desc }}</td>
               <td>{{ item.price }} ETH</td>
               <td>
                 <v-btn color="accent" variant="tonal">View</v-btn>
@@ -86,14 +86,14 @@
     >
       <v-col
         v-for="item in ownedNFTs"
-        :key="item.address"
+        :key="item.tokenUri"
         :md="iconSize"
         cols="12"
       >
         <v-card class="mx-auto py-2" max-width="344" variant="tonal">
-          <v-img height="194" :src="item.image"></v-img>
+          <v-img height="194" :src="item.tokenUri"></v-img>
           <v-card-title>{{ item.name }}</v-card-title>
-          <v-card-subtitle>{{ item.address }}</v-card-subtitle>
+          <v-card-subtitle>{{ item.desc }}</v-card-subtitle>
           <v-card-text>{{ item.price }} ETH</v-card-text>
           <v-card-actions class="d-flex justify-space-between mx-2">
             <v-btn width="100%" color="accent" variant="tonal">View</v-btn>
@@ -118,8 +118,9 @@
 </template>
 
 <script>
-import { ref, computed } from "vue";
+import { ref, computed, onMounted } from "vue";
 import filterMenu from "./filterMenu.vue";
+import { useMarketStore } from "@/stores/market";
 
 export default {
   name: "OwnedNFT",
@@ -127,6 +128,7 @@ export default {
     filterMenu,
   },
   setup() {
+    const { getMyNFTs } = useMarketStore();
     var menu = ref(false);
     var selectedView = ref("smallIcon");
 
@@ -135,44 +137,28 @@ export default {
       selectedView.value == "largeIcon" ? 4 : 2
     );
 
-    const ownedNFTs = [
-      {
-        name: "NFT",
-        address: "0x2e8cf6a2a...87d3",
-        price: 0.1,
-        image: "https://picsum.photos/500/300?image=10",
-      },
-      {
-        name: "NFT",
-        address: "0x2e8cf6a2a...87d3",
-        price: 0.1,
-        image: "https://picsum.photos/500/300?image=12",
-      },
-      {
-        name: "NFT",
-        address: "0x2e8cf6a2a...87d3",
-        price: 0.1,
-        image: "https://picsum.photos/500/300?image=112",
-      },
-      {
-        name: "NFT",
-        address: "0x2e8cf6a2a...87d3",
-        price: 0.1,
-        image: "https://picsum.photos/500/300?image=122",
-      },
-      {
-        name: "NFT",
-        address: "0x2e8cf6a2a...87d3",
-        price: 0.1,
-        image: "https://picsum.photos/500/300?image=42",
-      },
-      {
-        name: "NFT",
-        address: "0x2e8cf6a2a...87d3",
-        price: 0.1,
-        image: "https://picsum.photos/500/300?image=12",
-      },
-    ];
+    const ownedNFTs = ref([]);
+
+    onMounted(async () => {
+      const res = await getMyNFTs();
+      console.log(res);
+      if (res) {
+        ownedNFTs.value = await Promise.all(
+          res.map(async (i) => {
+            let nft = {
+              seller: i.seller,
+              owner: i.owner,
+              price: i.price,
+              tokenUri: i.tokenUri,
+              name: i.tokenName,
+              desc: i.tokenDescription,
+              royalty: i.tokenRoyalty,
+            };
+            return nft;
+          })
+        );
+      }
+    });
 
     return {
       menu,
