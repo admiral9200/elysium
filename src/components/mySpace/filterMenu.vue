@@ -4,9 +4,12 @@
     :close-on-content-click="false"
     location="end"
     transition="slide-x-transition"
+    theme="dark"
   >
     <template v-slot:activator="{ props }">
-      <v-btn prepend-icon="mdi-filter-cog" v-bind="props">Filter</v-btn>
+      <v-btn prepend-icon="mdi-filter-cog" v-bind="props" color="white"
+        >Filter</v-btn
+      >
     </template>
     <v-card min-width="300">
       <v-list>
