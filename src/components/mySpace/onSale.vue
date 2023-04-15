@@ -107,10 +107,8 @@
         <p class="mt-2">
           You can buy NFTs from the marketplace or create your own NFTs
         </p>
-        <v-btn color="accent" variant="contained" class="mt-4"> Buy NFT </v-btn>
-        <v-btn color="accent" variant="contained" class="mt-4">
-          Create NFT
-        </v-btn>
+        <v-btn color="accent" variant="text" class="mt-4"> Buy NFT </v-btn>
+        <v-btn color="accent" variant="text" class="mt-4"> Create NFT </v-btn>
       </v-col>
     </v-row>
   </v-container>
