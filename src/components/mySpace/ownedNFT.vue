@@ -136,26 +136,26 @@ export default {
 
     const ownedNFTs = ref([]);
 
-    // onMounted(async () => {
-    //   const res = await getMyNFTs();
-    //   console.log(res);
-    //   if (res) {
-    //     ownedNFTs.value = await Promise.all(
-    //       res.map(async (i) => {
-    //         let nft = {
-    //           seller: i.seller,
-    //           owner: i.owner,
-    //           price: i.price,
-    //           tokenUri: i.tokenUri,
-    //           name: i.tokenName,
-    //           desc: i.tokenDescription,
-    //           royalty: i.tokenRoyalty,
-    //         };
-    //         return nft;
-    //       })
-    //     );
-    //   }
-    // });
+    onMounted(async () => {
+      const res = await getMyNFTs();
+      console.log(res);
+      if (res) {
+        ownedNFTs.value = await Promise.all(
+          res.map(async (i) => {
+            let nft = {
+              seller: i.seller,
+              owner: i.owner,
+              price: i.price,
+              tokenUri: i.tokenUri,
+              name: i.tokenName,
+              desc: i.tokenDescription,
+              royalty: i.tokenRoyalty,
+            };
+            return nft;
+          })
+        );
+      }
+    });
 
     return {
       menu,
