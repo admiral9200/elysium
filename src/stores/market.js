@@ -120,6 +120,7 @@ export const useMarketStore = defineStore("user", () => {
                 seller: i.seller,
                 owner: i.owner,
                 price,
+                tokenId: i.tokenId.toString(),
                 tokenUri: "https://ipfs.io/ipfs/" + imgHash,
                 tokenName: meta.name,
                 tokenDescription: meta.description,

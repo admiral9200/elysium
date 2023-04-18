@@ -63,7 +63,7 @@
             </tr>
           </thead>
           <tbody>
-            <tr v-for="item in ownedNFTs" :key="item.tokenUri">
+            <tr v-for="item in ownedNFTs" :key="item.id">
               <td><v-img height="80" :src="item.tokenUri"></v-img></td>
               <td>{{ item.name }}</td>
               <td>{{ item.desc }}</td>
@@ -83,19 +83,20 @@
         ownedNFTs.length > 0
       "
     >
-      <v-col
-        v-for="item in ownedNFTs"
-        :key="item.tokenUri"
-        :md="iconSize"
-        cols="12"
-      >
+      <v-col v-for="item in ownedNFTs" :key="item.id" :md="iconSize" cols="12">
         <v-card class="mx-auto py-2" max-width="344" variant="tonal">
           <v-img height="194" :src="item.tokenUri"></v-img>
           <v-card-title>{{ item.name }}</v-card-title>
           <v-card-subtitle>{{ item.desc }}</v-card-subtitle>
           <v-card-text>{{ item.price }} ETH</v-card-text>
           <v-card-actions class="d-flex justify-space-between mx-2">
-            <v-btn width="100%" color="accent" variant="tonal">View</v-btn>
+            <v-btn
+              width="100%"
+              color="accent"
+              variant="tonal"
+              @click="selectNFT(ownedNFTs.indexOf(item))"
+              >View</v-btn
+            >
           </v-card-actions>
         </v-card>
       </v-col>
@@ -112,22 +113,36 @@
       </v-col>
     </v-row>
   </v-container>
+  <v-overlay
+    v-model="showNFTDetail"
+    location-strategy="connected"
+    class="d-flex justify-center align-center"
+  >
+    <ViewNFT
+      v-if="showNFTDetail"
+      :nft="ownedNFTs[selectedNFT]"
+      @onClose="() => (showNFTDetail = !showNFTDetail)"
+    />
+  </v-overlay>
 </template>
 
 <script>
 import { ref, computed, onMounted } from "vue";
-import filterMenu from "./filterMenu.vue";
 import { useMarketStore } from "@/stores/market";
+import filterMenu from "@/components/mySpace/filterMenu.vue";
+import ViewNFT from "@/components/mySpace/viewNFT.vue";
 
 export default {
   name: "OwnedNFT",
   components: {
     filterMenu,
+    ViewNFT,
   },
   setup() {
     const { getMyNFTs } = useMarketStore();
     var menu = ref(false);
     var selectedView = ref("smallIcon");
+    const showNFTDetail = ref(false);
 
     // computed
     const iconSize = computed(() =>
@@ -135,6 +150,12 @@ export default {
     );
 
     const ownedNFTs = ref([]);
+    const selectedNFT = ref();
+
+    const selectNFT = (loc) => {
+      showNFTDetail.value = !showNFTDetail.value;
+      selectedNFT.value = loc;
+    };
 
     onMounted(async () => {
       const res = await getMyNFTs();
@@ -143,6 +164,7 @@ export default {
         ownedNFTs.value = await Promise.all(
           res.map(async (i) => {
             let nft = {
+              id: i.tokenId,
               seller: i.seller,
               owner: i.owner,
               price: i.price,
@@ -161,9 +183,12 @@ export default {
       menu,
       selectedView,
       ownedNFTs,
-
-      // computed
+      showNFTDetail,
+      selectedNFT,
+      //computed
       iconSize,
+      //methods
+      selectNFT,
     };
   },
 };
