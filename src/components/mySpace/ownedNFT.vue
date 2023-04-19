@@ -69,7 +69,12 @@
               <td>{{ item.desc }}</td>
               <td>{{ item.price }} ETH</td>
               <td>
-                <v-btn color="accent" variant="tonal">View</v-btn>
+                <v-btn
+                  color="accent"
+                  variant="tonal"
+                  @click="selectNFT(ownedNFTs.indexOf(item))"
+                  >View</v-btn
+                >
               </td>
             </tr>
           </tbody>

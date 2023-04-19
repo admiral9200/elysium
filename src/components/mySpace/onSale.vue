@@ -69,7 +69,12 @@
               <td>{{ item.desc }}</td>
               <td>{{ item.price }} ETH</td>
               <td>
-                <v-btn color="accent" variant="tonal">View</v-btn>
+                <v-btn
+                  color="accent"
+                  variant="tonal"
+                  @click="selectNFT(listedNFTs.indexOf(item))"
+                  >View</v-btn
+                >
               </td>
             </tr>
           </tbody>
@@ -95,7 +100,13 @@
           <v-card-subtitle>{{ item.desc }}</v-card-subtitle>
           <v-card-text>{{ item.price }} ETH</v-card-text>
           <v-card-actions class="d-flex justify-space-between mx-2">
-            <v-btn width="100%" color="accent" variant="tonal">View</v-btn>
+            <v-btn
+              width="100%"
+              color="accent"
+              variant="tonal"
+              @click="selectNFT(listedNFTs.indexOf(item))"
+              >View</v-btn
+            >
           </v-card-actions>
         </v-card>
       </v-col>
@@ -112,22 +123,36 @@
       </v-col>
     </v-row>
   </v-container>
+  <v-overlay
+    v-model="showNFTDetail"
+    location-strategy="connected"
+    class="d-flex justify-center align-center"
+  >
+    <ViewNFT
+      v-if="showNFTDetail"
+      :nft="listedNFTs[selectedNFT]"
+      @onClose="() => (showNFTDetail = !showNFTDetail)"
+    />
+  </v-overlay>
 </template>
 
 <script>
 import { ref, computed, onMounted } from "vue";
 import filterMenu from "./filterMenu.vue";
 import { useMarketStore } from "@/stores/market";
+import ViewNFT from "@/components/mySpace/viewNFT.vue";
 
 export default {
   name: "OnSale",
   components: {
     filterMenu,
+    ViewNFT,
   },
   setup() {
     const { getListedNFTs } = useMarketStore();
     var menu = ref(false);
     var selectedView = ref("smallIcon");
+    const showNFTDetail = ref(false);
 
     // computed
     const iconSize = computed(() =>
@@ -135,6 +160,12 @@ export default {
     );
 
     const listedNFTs = ref([]);
+    const selectedNFT = ref();
+
+    const selectNFT = (loc) => {
+      showNFTDetail.value = !showNFTDetail.value;
+      selectedNFT.value = loc;
+    };
 
     onMounted(async () => {
       const res = await getListedNFTs();
@@ -142,6 +173,7 @@ export default {
         listedNFTs.value = await Promise.all(
           res.map(async (i) => {
             let nft = {
+              id: i.tokenId,
               seller: i.seller,
               owner: i.owner,
               price: i.price,
@@ -160,9 +192,12 @@ export default {
       menu,
       selectedView,
       listedNFTs,
-
+      showNFTDetail,
+      selectedNFT,
       // computed
       iconSize,
+      // methods
+      selectNFT,
     };
   },
 };
