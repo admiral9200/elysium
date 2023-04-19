@@ -12,7 +12,9 @@
     </v-card-title>
     <v-card-actions>
       <p>{{ cartItems.length }} Item<a v-if="cartItems.length > 1">s</a></p>
-      <v-btn class="ms-auto" text> Clear All </v-btn>
+      <v-btn class="ms-auto" variant="text" color="red" @click="clearCart()">
+        Clear All
+      </v-btn>
     </v-card-actions>
     <v-divider></v-divider>
     <v-container class="overflow-y-auto" style="height: 72vh" fluid>
@@ -41,6 +43,7 @@
                         small
                         icon="mdi-delete"
                         variant="text"
+                        @click="removeCartItem(cartItems.indexOf(item))"
                       ></v-btn>
                     </div>
                     <p v-if="!isHovering">{{ item.price }} ETH</p>
@@ -75,6 +78,7 @@ export default {
   emits: ["onShowCart"],
   setup() {
     const cartItems = ref([]);
+    const cartItemId = ref([]);
     const { getAllListedNFTs } = useMarketStore();
     const totalPrice = ref(0);
 
@@ -85,10 +89,41 @@ export default {
           if (marketItem[i].tokenId === cartItem[j]) {
             totalPrice.value += Number(marketItem[i].price);
             cartItemDetails.value.push(marketItem[i]);
+            cartItemId.value.push(marketItem[i].tokenId);
           }
         }
       }
       return cartItemDetails.value;
+    };
+
+    const removeCartItem = async (tokenIndex) => {
+      console.log("removeCartItem", tokenIndex);
+      cartItems.value.splice(tokenIndex, 1);
+      cartItemId.value.splice(tokenIndex, 1);
+      console.log("cartItems", cartItemId.value);
+      try {
+        const res = await axios.put("/api/cart", {
+          user_address: sessionStorage.getItem("address"),
+          cart_content: cartItemId.value,
+        });
+        console.log(res);
+      } catch (err) {
+        console.log(err);
+      }
+    };
+
+    const clearCart = async () => {
+      try {
+        const res = await axios.put("/api/cart", {
+          user_address: sessionStorage.getItem("address"),
+          cart_content: [],
+        });
+        cartItems.value = [];
+        cartItemId.value = [];
+        console.log(res);
+      } catch (err) {
+        console.log(err);
+      }
     };
 
     onMounted(async () => {
@@ -96,7 +131,10 @@ export default {
         const res = await axios.post("/api/cart/check", {
           user_address: sessionStorage.getItem("address"),
         });
-        if (res.data === "Cart not found") {
+        if (
+          res.data === "Cart not found" ||
+          res.data.cart_content.length === 0
+        ) {
           cartItems.value = [];
         } else {
           const allListedNFTs = await getAllListedNFTs();
@@ -114,6 +152,8 @@ export default {
     return {
       cartItems,
       totalPrice,
+      removeCartItem,
+      clearCart,
     };
   },
 };
