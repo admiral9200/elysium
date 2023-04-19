@@ -96,11 +96,52 @@ export const useMarketStore = defineStore("user", () => {
     }
   };
 
+  const getAllListedNFTs = async () => {
+    try {
+      const { ethereum } = window;
+      if (ethereum) {
+        const provider = new ethers.BrowserProvider(ethereum);
+        const signer = await provider.getSigner();
+        const marketContract = new ethers.Contract(
+          contractAddress,
+          contractABI.abi,
+          signer
+        );
+        const res = await marketContract.fetchMarketItems();
+        if (res.length > 0) {
+          const nfts = await Promise.all(
+            res.map(async (i) => {
+              const tokenHash = await marketContract.tokenURI(i.tokenId);
+              const meta = await getTokenMeta(tokenHash);
+              const imgHash = meta.image;
+              let price = ethers.formatUnits(i.price.toString(), "ether");
+              let nft = {
+                seller: i.seller,
+                owner: i.owner,
+                price,
+                tokenId: i.tokenId.toString(),
+                tokenUri: "https://ipfs.io/ipfs/" + imgHash,
+                tokenName: meta.name,
+                tokenDescription: meta.description,
+                tokenRoyalty: meta.royalty,
+              };
+              return nft;
+            })
+          );
+          return nfts;
+        } else return null;
+      } else {
+        console.log("Ethereum object doesn't exist!");
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
   const getMyNFTs = async () => {
     try {
       const { ethereum } = window;
       if (ethereum) {
-        // create provider object from ethers library, using ethereum object injected by metamask
         const provider = new ethers.BrowserProvider(ethereum);
         const signer = await provider.getSigner();
         const marketContract = new ethers.Contract(
@@ -143,7 +184,6 @@ export const useMarketStore = defineStore("user", () => {
     try {
       const { ethereum } = window;
       if (ethereum) {
-        // create provider object from ethers library, using ethereum object injected by metamask
         const provider = new ethers.BrowserProvider(ethereum);
         const signer = await provider.getSigner();
         const marketContract = new ethers.Contract(
@@ -199,6 +239,7 @@ export const useMarketStore = defineStore("user", () => {
     uploadFileToIPFS,
     uploadJSONToIPFS,
     mintNFT,
+    getAllListedNFTs,
     getMyNFTs,
     getListedNFTs,
   };
