@@ -149,7 +149,7 @@ export default {
     ViewNFT,
   },
   setup() {
-    const { getListedNFTs } = useMarketStore();
+    const { getMyCollection, getListedNFTs } = useMarketStore();
     var menu = ref(false);
     var selectedView = ref("smallIcon");
     const showNFTDetail = ref(false);
@@ -168,23 +168,26 @@ export default {
     };
 
     onMounted(async () => {
-      const res = await getListedNFTs();
-      if (res) {
-        listedNFTs.value = await Promise.all(
-          res.map(async (i) => {
-            let nft = {
-              id: i.tokenId,
-              seller: i.seller,
-              owner: i.owner,
-              price: i.price,
-              tokenUri: i.tokenUri,
-              name: i.tokenName,
-              desc: i.tokenDescription,
-              royalty: i.tokenRoyalty,
-            };
-            return nft;
-          })
-        );
+      try {
+        const collectionAddress = await getMyCollection();
+        const res = await getListedNFTs(collectionAddress[0]);
+        if (res) {
+          listedNFTs.value = await Promise.all(
+            res.map(async (i) => {
+              let nft = {
+                id: i.tokenId,
+                seller: i.seller,
+                price: i.price,
+                tokenUri: i.tokenUri,
+                name: i.tokenName,
+                desc: i.tokenDescription,
+              };
+              return nft;
+            })
+          );
+        }
+      } catch (err) {
+        console.log(err);
       }
     });
 
