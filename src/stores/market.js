@@ -213,6 +213,11 @@ export const useMarketStore = defineStore("user", () => {
         );
 
         console.log(signer, await nftContract.ownerOf(tokenId));
+        const approveTxn = await nftContract.approve(
+          marketContractAddress,
+          tokenId
+        );
+        console.log("approveTxn", approveTxn);
         const tokenTxn = await marketContract.listNft(
           tokenAddress,
           tokenId,

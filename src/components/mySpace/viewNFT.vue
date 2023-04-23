@@ -16,6 +16,9 @@
       <v-btn class="me-2" variant="tonal" @click="$emit('onClose')">
         Close
       </v-btn>
+      <v-btn color="primary" variant="outlined" @click="sell(nft.id)">
+        Sell
+      </v-btn>
       <v-btn color="primary" variant="outlined" @click="addCart(nft.id)">
         Add Cart
       </v-btn>
@@ -25,11 +28,30 @@
 <script>
 import { ref } from "vue";
 import axios from "axios";
+import { useMarketStore } from "@/stores/market";
+
 export default {
   name: "View NFT",
   props: ["nft"],
   emits: ["onClose"],
   setup() {
+    const { getMyCollection, listNFT } = useMarketStore();
+
+    const price = ref(1);
+    const sell = async (nftId) => {
+      try {
+        const collectionAddress = await getMyCollection();
+        const res = await listNFT(
+          collectionAddress[0],
+          nftId,
+          price.value.toString()
+        );
+        console.log(res);
+      } catch (err) {
+        console.log(err);
+      }
+    };
+
     let nfts = ref([]);
     const addCart = async (nftId) => {
       try {
@@ -71,6 +93,7 @@ export default {
     };
 
     return {
+      sell,
       addCart,
     };
   },
