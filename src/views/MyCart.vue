@@ -79,22 +79,8 @@ export default {
   setup() {
     const cartItems = ref([]);
     const cartItemId = ref([]);
-    const { getAllListedNFTs } = useMarketStore();
+    const { getCartNFTs } = useMarketStore();
     const totalPrice = ref(0);
-
-    const getCartItemDetails = (marketItem, cartItem) => {
-      let cartItemDetails = ref([]);
-      for (let i = 0; i < marketItem.length; i++) {
-        for (let j = 0; j < cartItem.length; j++) {
-          if (marketItem[i].tokenId === cartItem[j]) {
-            totalPrice.value += Number(marketItem[i].price);
-            cartItemDetails.value.push(marketItem[i]);
-            cartItemId.value.push(marketItem[i].tokenId);
-          }
-        }
-      }
-      return cartItemDetails.value;
-    };
 
     const removeCartItem = async (tokenIndex) => {
       console.log("removeCartItem", tokenIndex);
@@ -137,11 +123,7 @@ export default {
         ) {
           cartItems.value = [];
         } else {
-          const allListedNFTs = await getAllListedNFTs();
-          cartItems.value = getCartItemDetails(
-            allListedNFTs,
-            res.data.cart_content
-          );
+          cartItems.value = await getCartNFTs(res.data.cart_content);
           console.log("cartItem", cartItems.value);
         }
       } catch (error) {

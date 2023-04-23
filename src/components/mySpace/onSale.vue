@@ -181,6 +181,7 @@ export default {
                 tokenUri: i.tokenUri,
                 name: i.tokenName,
                 desc: i.tokenDescription,
+                collection: collectionAddress[0],
               };
               return nft;
             })

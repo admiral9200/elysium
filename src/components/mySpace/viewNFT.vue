@@ -19,7 +19,11 @@
       <v-btn color="primary" variant="outlined" @click="sell(nft.id)">
         Sell
       </v-btn>
-      <v-btn color="primary" variant="outlined" @click="addCart(nft.id)">
+      <v-btn
+        color="primary"
+        variant="outlined"
+        @click="addCart(nft.collection, nft.id)"
+      >
         Add Cart
       </v-btn>
     </v-card-actions>
@@ -53,29 +57,37 @@ export default {
     };
 
     let nfts = ref([]);
-    const addCart = async (nftId) => {
+    const addCart = async (nftCollection, nftId) => {
       try {
         const res = await axios.post("/api/cart/check", {
           user_address: sessionStorage.getItem("address"),
         });
         console.log(res);
         if (res.data === "Cart not found") {
-          nfts.value.push(nftId);
+          nfts.value.push({ collection: nftCollection, tokenId: nftId });
           try {
             const res = await axios.post("/api/cart", {
               user_address: sessionStorage.getItem("address"),
               cart_content: nfts.value,
             });
-            console.log(res);
           } catch (err) {
             console.log(err);
           }
         } else {
           nfts.value = res.data.cart_content;
-          if (nfts.value.includes(nftId)) {
-            console.log("NFT already in cart");
-          } else {
-            nfts.value.push(nftId);
+          let exist = false;
+          for (let i = 0; i < nfts.value.length; i++) {
+            if (
+              nfts.value[i].collection === nftCollection &&
+              nfts.value[i].tokenId === nftId
+            ) {
+              exist = true;
+              console.log("NFT already in cart");
+              break;
+            }
+          }
+          if (!exist) {
+            nfts.value.push({ collection: nftCollection, tokenId: nftId });
             try {
               const res = await axios.put("/api/cart", {
                 user_address: sessionStorage.getItem("address"),

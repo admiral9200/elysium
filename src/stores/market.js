@@ -281,6 +281,52 @@ export const useMarketStore = defineStore("user", () => {
     }
   };
 
+  const getCartNFTs = async (cartContent) => {
+    try {
+      const { ethereum } = window;
+      if (ethereum) {
+        const provider = new ethers.BrowserProvider(ethereum);
+        const signer = await provider.getSigner();
+        const marketContract = new ethers.Contract(
+          marketContractAddress,
+          marketContractABI.abi,
+          signer
+        );
+        const nfts = [];
+        for (let i = 0; i < cartContent.length; i++) {
+          const nftContract = new ethers.Contract(
+            cartContent[i].collection,
+            nftContractABI.abi,
+            signer
+          );
+          const marketItem = await marketContract.getListedNFT(
+            cartContent[i].collection,
+            cartContent[i].tokenId
+          );
+          const tokenHash = await nftContract.tokenURI(cartContent[i].tokenId);
+          const meta = await getTokenMeta(tokenHash);
+          const imgHash = meta.image;
+          let nft = {
+            seller: marketItem.seller,
+            tokenId: cartContent.tokenId,
+            price: ethers.formatUnits(marketItem.price.toString(), "ether"),
+            tokenUri: "https://ipfs.io/ipfs/" + imgHash,
+            tokenName: meta.name,
+            tokenDescription: meta.description,
+          };
+          nfts.push(nft);
+        }
+        if (nfts.length > 0) {
+          return nfts;
+        } else return null;
+      } else {
+        console.log("Ethereum object doesn't exist!");
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
   const buyNFT = async () => {
     const tokenTxn = await marketContract.createToken(
       tokenURI,
@@ -303,6 +349,7 @@ export const useMarketStore = defineStore("user", () => {
     getOwnedNFTs,
     listNFT,
     getListedNFTs,
+    getCartNFTs,
   };
 });
 
