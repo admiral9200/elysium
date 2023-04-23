@@ -8,7 +8,6 @@
             <v-card-text>
               <v-text-field
                 v-model="wallet"
-                model-value="0x2e8cf6a2a42C7F9c95136845fEf36798efA487d3"
                 label="Wallet Address"
                 variant="outlined"
                 density="compact"
@@ -91,9 +90,7 @@
               </div>
             </v-card-text>
             <v-card-actions class="d-flex justify-end">
-              <v-btn color="error" variant="tonal" @click="reset">
-                Reset
-              </v-btn>
+              <v-btn color="error" variant="tonal"> Reset </v-btn>
               <v-btn color="primary" variant="tonal" @click="submit">
                 Create
               </v-btn>
@@ -127,9 +124,11 @@ export default {
   name: "CreateNFT",
   components: {},
   setup() {
-    const { uploadFileToIPFS, uploadJSONToIPFS, mintNFT } = useMarketStore();
+    const { uploadFileToIPFS, uploadJSONToIPFS, getMyCollection, mintNFT } =
+      useMarketStore();
     // data
     const valid = ref(false);
+    const wallet = ref("0x2e8cf6a2a42C7F9c95136845fEf36798efA487d3");
     const name = ref("");
     const description = ref("");
     const onSale = ref("No");
@@ -147,29 +146,39 @@ export default {
     const submit = async () => {
       // if (valid.value) {
       const fileData = await uploadFileToIPFS(file.value[0]);
-      console.log(fileData.IpfsHash);
+      console.log("fileData.IpfsHash", fileData.IpfsHash);
       const json = {
         name: name.value,
         description: description.value,
         image: fileData.IpfsHash,
-        loyalty: loyalty.value,
+        // loyalty: loyalty.value, //??? shud put here or the chain
       };
       const jsonFile = await uploadJSONToIPFS(json);
-      console.log(jsonFile.IpfsHash);
-      const mint = await mintNFT(jsonFile.IpfsHash, price.value.toString());
-
+      console.log("file", jsonFile.IpfsHash);
+      const collectionAddress = await getMyCollection();
+      const mint = await mintNFT(
+        sessionStorage.getItem("address"),
+        collectionAddress[0],
+        jsonFile.IpfsHash
+      );
+      // const collectionAddress = await getMyCollection();
       // const mint = await mintNFT(
-      //   "QmRaWcj4SsKuYyaemp7upnjHxk44AtC13JBvzwGH3YbJzc",
-      //   "1"
+      //   sessionStorage.getItem("address"),
+      //   collectionAddress[0],
+      //   "QmRaWcj4SsKuYyaemp7upnjHxk44AtC13JBvzwGH3YbJzc"
       // );
 
-      console.log(mint);
-      //   console.log("submit");
+      console.log("mint", mint);
+
+      // if(onSale){
+      //TODO if set on sale, list the nft
+      //   const list = await
       // }
     };
 
     return {
       valid,
+      wallet,
       name,
       description,
       onSale,

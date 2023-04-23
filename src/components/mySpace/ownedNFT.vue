@@ -93,7 +93,6 @@
           <v-img height="194" :src="item.tokenUri"></v-img>
           <v-card-title>{{ item.name }}</v-card-title>
           <v-card-subtitle>{{ item.desc }}</v-card-subtitle>
-          <v-card-text>{{ item.price }} ETH</v-card-text>
           <v-card-actions class="d-flex justify-space-between mx-2">
             <v-btn
               width="100%"
@@ -144,7 +143,7 @@ export default {
     ViewNFT,
   },
   setup() {
-    const { getMyNFTs } = useMarketStore();
+    const { getOwnedNFTs } = useMarketStore();
     var menu = ref(false);
     var selectedView = ref("smallIcon");
     const showNFTDetail = ref(false);
@@ -163,20 +162,16 @@ export default {
     };
 
     onMounted(async () => {
-      const res = await getMyNFTs();
+      const res = await getOwnedNFTs(sessionStorage.getItem("address"));
       console.log(res);
       if (res) {
         ownedNFTs.value = await Promise.all(
           res.map(async (i) => {
             let nft = {
               id: i.tokenId,
-              seller: i.seller,
-              owner: i.owner,
-              price: i.price,
               tokenUri: i.tokenUri,
               name: i.tokenName,
               desc: i.tokenDescription,
-              royalty: i.tokenRoyalty,
             };
             return nft;
           })
