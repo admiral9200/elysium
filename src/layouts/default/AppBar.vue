@@ -90,6 +90,11 @@ export default {
         link: "/user/" + sessionStorage.getItem("address"),
       },
       {
+        text: "My Collection",
+        icon: "mdi-cards",
+        link: "/collection/" + sessionStorage.getItem("address"),
+      },
+      {
         text: "Create NFT",
         icon: "mdi-pencil-ruler",
         link: "/create-nft",

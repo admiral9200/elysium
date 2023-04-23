@@ -14,6 +14,12 @@ const routes = [
       import(/* webpackChunkName: "MySpace" */ "@/views/MySpace.vue"),
   },
   {
+    path: "/collection/:address",
+    name: "MyCollection",
+    component: () =>
+      import(/* webpackChunkName: "MySpace" */ "@/views/MyCollection.vue"),
+  },
+  {
     path: "/create-nft",
     name: "CreateNFT",
     component: () =>
