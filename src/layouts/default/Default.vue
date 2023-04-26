@@ -34,7 +34,7 @@
 import { ref } from "vue";
 
 import DefaultBar from "./AppBar.vue";
-import DefaultFooter from "./Footer.vue";
+import DefaultFooter from "./AppFooter.vue";
 import SignUp from "@/views/SignUp.vue";
 import MyCart from "@/views/MyCart.vue";
 
