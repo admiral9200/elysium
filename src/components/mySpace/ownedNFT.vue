@@ -163,6 +163,7 @@ export default {
 
     onMounted(async () => {
       const res = await getOwnedNFTs(sessionStorage.getItem("address"));
+
       console.log(res);
       if (res) {
         ownedNFTs.value = await Promise.all(
@@ -172,6 +173,7 @@ export default {
               tokenUri: i.tokenUri,
               name: i.tokenName,
               desc: i.tokenDescription,
+              collection: i.collection,
             };
             return nft;
           })
