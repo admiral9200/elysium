@@ -49,7 +49,7 @@ export default {
     Activity,
   },
   setup() {
-    var tab = ref(1);
+    const tab = ref(1);
     const route = useRoute();
     const userExist = ref(true);
 
