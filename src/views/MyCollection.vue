@@ -98,13 +98,17 @@ import { ref, onMounted } from "vue";
 import { useMarketStore } from "@/stores/market";
 import { useRoute } from "vue-router";
 import createCollection from "@/components/myCollection/createCollection.vue";
-import axios from "axios";
 
 export default {
   name: "CreateNFT",
   components: { createCollection },
   setup() {
-    const { getMyCollection } = useMarketStore();
+    const {
+      linkCollection,
+      getLinkedCollection,
+      unlinkCollection,
+      getMyCollection,
+    } = useMarketStore();
     const route = useRoute();
     const showForm = ref(false);
     const linkedCollection = ref([]);
@@ -112,63 +116,26 @@ export default {
     const collectionAddress = ref("");
 
     const link = async (address) => {
-      let exist = false;
-      let newCollections = linkedCollection.value;
-      if (newCollections.length > 0) {
-        if (newCollections.includes(address)) {
-          console.log("Already Linked");
-          exist = true;
-        } else {
-          newCollections.push(address);
-        }
-      } else {
-        newCollections = address;
-      }
-      if (!exist) {
-        const data = {
-          user_address: route.params.address,
-          nft_collection: newCollections,
-        };
-        console.log(newCollections);
-
-        try {
-          const res = await axios.put("/api/collection/", data);
-          if (res.data === "404") {
-            const newCollection = await axios.post("/api/collection/", data);
-            console.log("new collection", newCollection);
-          }
-          console.log("update collection", res);
-        } catch (err) {
-          console.log(err);
-        }
-      }
+      await linkCollection(route.params.address, address);
+      linkedCollection.value = await getLinkedCollection(route.params.address);
     };
 
     const unlink = async (tokenIndex) => {
-      let newCollections = linkedCollection.value;
-      newCollections.splice(tokenIndex, 1);
-      const data = {
-        user_address: route.params.address,
-        nft_collection: newCollections,
-      };
-      try {
-        const res = await axios.put("/api/collection/", data);
-        console.log("res", res);
-      } catch (err) {
-        console.log(err);
-      }
+      await unlinkCollection(route.params.address, tokenIndex);
+      linkedCollection.value = await getLinkedCollection(route.params.address);
     };
 
     onMounted(async () => {
       try {
-        const res = await axios.get("/api/collection/" + route.params.address);
-        if (res.data != "404") {
-          linkedCollection.value = res.data;
+        const res = await getLinkedCollection(route.params.address);
+        if (res != "404") {
+          linkedCollection.value = res;
           console.log("linked", linkedCollection.value);
         }
       } catch (err) {
         console.log(err);
       }
+
       try {
         createdCollection.value = await getMyCollection();
         console.log(createdCollection.value);

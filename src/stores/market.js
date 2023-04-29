@@ -16,7 +16,7 @@ export const useMarketStore = defineStore("user", () => {
   const loading = ref(false);
 
   // function setLoader(boolean) {
-  //   console.log("setloader", value);
+  //   console.log("setLoader", value);
   //   loading.value = value;
   // }
 
@@ -34,6 +34,63 @@ export const useMarketStore = defineStore("user", () => {
       account.value = myAccounts[0];
     } catch (error) {
       console.log(error);
+    }
+  };
+
+  const linkCollection = async (user_address, address) => {
+    let exist = false;
+    let newCollections = await getLinkedCollection(user_address);
+    if (newCollections.length > 0) {
+      if (newCollections.includes(address)) {
+        console.log("Already Linked");
+        exist = true;
+      } else {
+        newCollections.push(address);
+      }
+    } else {
+      newCollections = address;
+    }
+    if (!exist) {
+      const data = {
+        user_address: user_address,
+        nft_collection: newCollections,
+      };
+      console.log(newCollections);
+
+      try {
+        const res = await axios.put("/api/collection/", data);
+        if (res.data === "404") {
+          const newCollection = await axios.post("/api/collection/", data);
+          console.log("new collection", newCollection);
+        }
+        console.log("update collection", res);
+      } catch (err) {
+        console.log(err);
+      }
+    }
+  };
+
+  const getLinkedCollection = async (user_address) => {
+    try {
+      const res = await axios.get("/api/collection/" + user_address);
+      return res.data;
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
+  const unlinkCollection = async (user_address, tokenIndex) => {
+    let newCollections = await getLinkedCollection(user_address);
+    newCollections.splice(tokenIndex, 1);
+    const data = {
+      user_address: user_address,
+      nft_collection: newCollections,
+    };
+    try {
+      const res = await axios.put("/api/collection/", data);
+      console.log("res", res);
+    } catch (err) {
+      console.log(err);
     }
   };
 
@@ -176,6 +233,7 @@ export const useMarketStore = defineStore("user", () => {
           const imgHash = meta.image;
           let nft = {
             owner: owner,
+            collection: nftAddress[0],
             tokenId: tokenId.toString(),
             tokenUri: "https://ipfs.io/ipfs/" + imgHash,
             tokenName: meta.name,
@@ -215,6 +273,7 @@ export const useMarketStore = defineStore("user", () => {
           marketContractAddress,
           tokenId
         );
+        await approveTxn.wait();
         console.log("approveTxn", approveTxn);
         const tokenTxn = await marketContract.listNft(
           tokenAddress,
@@ -281,6 +340,21 @@ export const useMarketStore = defineStore("user", () => {
     }
   };
 
+  const getAllListedNFTs = async (collectionAddress) => {
+    let nfts = [];
+    for (const collection of collectionAddress) {
+      const res = await getListedNFTs(collection);
+      if (res) {
+        nfts = nfts.concat(res);
+      }
+    }
+    if (nfts.length > 0) {
+      return nfts;
+    } else return null;
+  };
+
+  //TODO getAllListedNFTs by a single seller
+
   const getCartNFTs = async (cartContent) => {
     try {
       const { ethereum } = window;
@@ -293,17 +367,17 @@ export const useMarketStore = defineStore("user", () => {
           signer
         );
         const nfts = [];
-        for (let i = 0; i < cartContent.length; i++) {
+        for (const item of cartContent) {
           const nftContract = new ethers.Contract(
-            cartContent[i].collection,
+            item.collection,
             nftContractABI.abi,
             signer
           );
           const marketItem = await marketContract.getListedNFT(
-            cartContent[i].collection,
-            cartContent[i].tokenId
+            item.collection,
+            item.tokenId
           );
-          const tokenHash = await nftContract.tokenURI(cartContent[i].tokenId);
+          const tokenHash = await nftContract.tokenURI(item.tokenId);
           const meta = await getTokenMeta(tokenHash);
           const imgHash = meta.image;
           let nft = {
@@ -327,12 +401,31 @@ export const useMarketStore = defineStore("user", () => {
     }
   };
 
-  const buyNFT = async () => {
-    const tokenTxn = await marketContract.createToken(
-      tokenURI,
-      ethers.parseUnits(price, "ether"),
-      { value: listingPrice }
-    );
+  const buyNFT = async (tokenAddress, tokenId, tokenRoyalty, tokenPrice) => {
+    const { ethereum } = window;
+    if (ethereum) {
+      const provider = new ethers.BrowserProvider(ethereum);
+      const signer = await provider.getSigner();
+      const marketContract = new ethers.Contract(
+        marketContractAddress,
+        marketContractABI.abi,
+        signer
+      );
+      const price = ethers.parseUnits(tokenPrice, "ether");
+      try {
+        const tokenTxn = await marketContract.buyNFT(
+          tokenAddress,
+          tokenId,
+          price,
+          {
+            value: price,
+          }
+        );
+        console.log(tokenTxn);
+      } catch (err) {
+        console.log(err);
+      }
+    }
   };
 
   return {
@@ -341,6 +434,9 @@ export const useMarketStore = defineStore("user", () => {
     loading,
     // market,
     connectWallet,
+    linkCollection,
+    getLinkedCollection,
+    unlinkCollection,
     uploadFileToIPFS,
     uploadJSONToIPFS,
     createNFTCollection,
@@ -349,7 +445,9 @@ export const useMarketStore = defineStore("user", () => {
     getOwnedNFTs,
     listNFT,
     getListedNFTs,
+    getAllListedNFTs,
     getCartNFTs,
+    buyNFT,
   };
 });
 
