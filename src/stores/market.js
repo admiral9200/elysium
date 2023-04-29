@@ -22,12 +22,11 @@ export const useMarketStore = defineStore("user", () => {
 
   const connectWallet = async () => {
     try {
-      const { ethereum } = window;
-      if (!ethereum) {
+      if (!window.ethereum) {
         alert("Must connect to MetaMask!");
         return;
       }
-      const myAccounts = await ethereum.request({
+      const myAccounts = await window.ethereum.request({
         method: "eth_requestAccounts",
       });
       console.log("Connected: ", myAccounts[0]);
@@ -144,7 +143,7 @@ export const useMarketStore = defineStore("user", () => {
     royaltyRecipient
   ) => {
     try {
-      if (window.ethereum != null) {
+      if (window.ethereum) {
         const provider = new ethers.BrowserProvider(window.ethereum);
         const signer = await provider.getSigner();
         const factoryContract = new ethers.Contract(
@@ -172,7 +171,7 @@ export const useMarketStore = defineStore("user", () => {
 
   const getMyCollection = async () => {
     try {
-      if (window.ethereum != null) {
+      if (window.ethereum) {
         const provider = new ethers.BrowserProvider(window.ethereum);
         const signer = await provider.getSigner();
         const factoryContract = new ethers.Contract(
@@ -193,7 +192,7 @@ export const useMarketStore = defineStore("user", () => {
   const mintNFT = async (ownerAddress, collectionAddress, tokenURI) => {
     console.log("collection", collectionAddress);
     try {
-      if (window.ethereum != null) {
+      if (window.ethereum) {
         const provider = new ethers.BrowserProvider(window.ethereum);
         const signer = await provider.getSigner();
         const nftContract = new ethers.Contract(
@@ -213,9 +212,8 @@ export const useMarketStore = defineStore("user", () => {
 
   const getOwnedNFTs = async (address) => {
     try {
-      const { ethereum } = window;
-      if (ethereum) {
-        const provider = new ethers.BrowserProvider(ethereum);
+      if (window.ethereum) {
+        const provider = new ethers.BrowserProvider(window.ethereum);
         const linkedCollection = await getLinkedCollection(address);
         const signer = await provider.getSigner();
 
@@ -259,7 +257,7 @@ export const useMarketStore = defineStore("user", () => {
 
   const listNFT = async (tokenAddress, tokenId, price) => {
     try {
-      if (window.ethereum != null) {
+      if (window.ethereum) {
         const provider = new ethers.BrowserProvider(window.ethereum);
         const signer = await provider.getSigner();
         const marketContract = new ethers.Contract(
@@ -293,9 +291,7 @@ export const useMarketStore = defineStore("user", () => {
 
   const unListNFT = async (tokenAddress, tokenId) => {
     try {
-      console.log("tokenTxn", tokenAddress, tokenId);
-
-      if (window.ethereum != null) {
+      if (window.ethereum) {
         const provider = new ethers.BrowserProvider(window.ethereum);
         const signer = await provider.getSigner();
         const marketContract = new ethers.Contract(
@@ -318,9 +314,8 @@ export const useMarketStore = defineStore("user", () => {
 
   const getListedNFTs = async (collectionAddress) => {
     try {
-      const { ethereum } = window;
-      if (ethereum) {
-        const provider = new ethers.BrowserProvider(ethereum);
+      if (window.ethereum) {
+        const provider = new ethers.BrowserProvider(window.ethereum);
         const signer = await provider.getSigner();
         const marketContract = new ethers.Contract(
           marketContractAddress,
@@ -390,9 +385,8 @@ export const useMarketStore = defineStore("user", () => {
 
   const getCartNFTs = async (cartContent) => {
     try {
-      const { ethereum } = window;
-      if (ethereum) {
-        const provider = new ethers.BrowserProvider(ethereum);
+      if (window.ethereum) {
+        const provider = new ethers.BrowserProvider(window.ethereum);
         const signer = await provider.getSigner();
         const marketContract = new ethers.Contract(
           marketContractAddress,
@@ -435,9 +429,8 @@ export const useMarketStore = defineStore("user", () => {
   };
 
   const buyNFT = async (tokenAddress, tokenId, tokenRoyalty, tokenPrice) => {
-    const { ethereum } = window;
-    if (ethereum) {
-      const provider = new ethers.BrowserProvider(ethereum);
+    if (window.ethereum) {
+      const provider = new ethers.BrowserProvider(window.ethereum);
       const signer = await provider.getSigner();
       const marketContract = new ethers.Contract(
         marketContractAddress,
