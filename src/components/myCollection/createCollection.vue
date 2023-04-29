@@ -50,7 +50,7 @@ import { ref } from "vue";
 import { useMarketStore } from "@/stores/market";
 
 export default {
-  name: "CreateNFT",
+  name: "createCollection",
   components: {},
   setup() {
     const { createNFTCollection } = useMarketStore();
