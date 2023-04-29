@@ -1,100 +1,185 @@
 <template>
   <v-container>
+    <v-card class="my-4" variant="outlined" theme="dark">
+      <v-card-title>Linked Collection</v-card-title>
+      <v-card-text v-if="linkedCollection.length > 0">
+        <v-table fixed-header height="300px" theme="dark">
+          <thead>
+            <tr>
+              <th scope="lcAddress" class="text-left">Collection Address</th>
+              <th scope="action" class="text-left">Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="item in linkedCollection" :key="item">
+              <td>{{ item }}</td>
+              <td>
+                <v-btn
+                  color="red"
+                  variant="tonal"
+                  @click="unlink(linkedCollection.indexOf(item))"
+                  >Unlink</v-btn
+                >
+              </td>
+            </tr>
+          </tbody>
+        </v-table>
+      </v-card-text>
+      <v-card-text v-else>
+        <h3 class="mt-4">You don't have any linked collection yet</h3>
+        <p class="mt-2">
+          You can can add collection to the marketplace or create your own
+          collection
+        </p>
+      </v-card-text>
+      <v-card-actions>
+        <v-text-field
+          v-model="collectionAddress"
+          label="Link Collection Address Manually"
+          placeholder="eg. 0xd0E9D7b417ef22a23D0df40aDb09860269226E53"
+          variant="outlined"
+          density="compact"
+          append-inner-icon="mdi-plus"
+          @click:append-inner="link(collectionAddress)"
+        ></v-text-field>
+      </v-card-actions>
+    </v-card>
+
     <v-card variant="outlined" theme="dark">
-      <v-card-title class="text-white"> Create New Collection</v-card-title>
-      <v-form @submit.prevent>
-        <v-card-text>
-          <v-text-field
-            v-model="wallet"
-            label="Wallet Address"
-            variant="outlined"
-            density="compact"
-            readonly
-          ></v-text-field>
-          <v-text-field
-            v-model="name"
-            label="Name"
-            variant="outlined"
-            density="compact"
-            required
-          ></v-text-field>
-          <v-text-field
-            v-model="symbol"
-            label="Symbol"
-            variant="outlined"
-            density="compact"
-            required
-          ></v-text-field>
-          <v-text-field
-            v-model="loyalty"
-            label="Loyalty"
-            variant="outlined"
-            density="compact"
-            suffix="%"
-            type="number"
-            min="0"
-            max="50"
-            dirty
-            required
-          ></v-text-field>
-        </v-card-text>
-        <v-card-actions class="d-flex justify-end">
-          <v-btn color="error" variant="tonal"> Reset </v-btn>
-          <v-btn color="primary" variant="tonal" @click="submit">
-            Create
-          </v-btn>
-        </v-card-actions>
-      </v-form>
-      <v-btn color="primary" @click="getCollection()">Get Collection</v-btn>
+      <v-card-title>Created Collection</v-card-title>
+      <v-card-text v-if="createdCollection.length > 0">
+        <v-table fixed-header height="300px" theme="dark">
+          <thead>
+            <tr>
+              <th scope="cAddress" class="text-left">Collection Address</th>
+              <th scope="action" class="text-left">Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="item in createdCollection" :key="item">
+              <td>{{ item }}</td>
+              <td>
+                <v-btn color="accent" variant="tonal" @click="link(item)"
+                  >Link</v-btn
+                >
+              </td>
+            </tr>
+          </tbody>
+        </v-table>
+      </v-card-text>
+      <v-card-text v-else>
+        <h3 class="mt-4">You don't have any linked collection yet</h3>
+        <p class="mt-2">
+          You can can add collection to the marketplace or create your own
+          collection
+        </p>
+      </v-card-text>
+      <v-card-actions>
+        <v-btn color="primary" @click="() => (showForm = !showForm)">
+          Create New Collection
+        </v-btn>
+      </v-card-actions>
     </v-card>
   </v-container>
+  <v-overlay
+    v-model="showForm"
+    location-strategy="connected"
+    class="d-flex justify-center align-center"
+  >
+    <create-collection
+      v-if="showForm"
+      @onShowForm="() => (showForm = !showForm)"
+    />
+  </v-overlay>
 </template>
 
 <script>
-import { ref } from "vue";
+import { ref, onMounted } from "vue";
 import { useMarketStore } from "@/stores/market";
+import { useRoute } from "vue-router";
+import createCollection from "@/components/myCollection/createCollection.vue";
+import axios from "axios";
 
 export default {
   name: "CreateNFT",
-  components: {},
+  components: { createCollection },
   setup() {
-    const { createNFTCollection, getMyCollection } = useMarketStore();
-    // data
-    const valid = ref(false);
-    const wallet = ref("0x2e8cf6a2a42C7F9c95136845fEf36798efA487d3");
-    const name = ref("");
-    const symbol = ref("");
-    const loyalty = ref("");
+    const { getMyCollection } = useMarketStore();
+    const route = useRoute();
+    const showForm = ref(false);
+    const linkedCollection = ref([]);
+    const createdCollection = ref([]);
+    const collectionAddress = ref("");
 
-    const submit = async () => {
-      // if (valid) {
+    const link = async (address) => {
+      let exist = false;
+      let newCollections = linkedCollection.value;
+      if (newCollections.length > 0) {
+        if (newCollections.includes(address)) {
+          console.log("Already Linked");
+          exist = true;
+        } else {
+          newCollections.push(address);
+        }
+      } else {
+        newCollections = address;
+      }
+      if (!exist) {
+        const data = {
+          address: route.params.address,
+          collections: newCollections,
+        };
+        console.log(newCollections);
+        try {
+          const res = await axios.put("/api/user/collections/", data);
+          console.log(res);
+        } catch (err) {
+          console.log(err);
+        }
+      }
+    };
+
+    const unlink = async (tokenIndex) => {
+      let newCollections = linkedCollection.value;
+      newCollections.splice(tokenIndex, 1);
+      newCollections.splice(tokenIndex, 1);
+      const data = {
+        address: route.params.address,
+        collections: newCollections,
+      };
       try {
-        const created = await createNFTCollection(
-          name.value,
-          symbol.value,
-          loyalty.value,
-          wallet.value
-        );
-        console.log(created);
+        const res = await axios.put("/api/user/collections/", data);
+        console.log(res);
       } catch (err) {
         console.log(err);
       }
-      // }
     };
 
-    const getCollection = async () => {
-      const collection = await getMyCollection();
-      console.log(collection);
-    };
+    onMounted(async () => {
+      try {
+        const res = await axios.get(
+          "/api/user/collections/" + route.params.address
+        );
+        linkedCollection.value = res.data;
+        console.log("linked", linkedCollection.value);
+      } catch (err) {
+        console.log(err);
+      }
+      try {
+        createdCollection.value = await getMyCollection();
+        console.log(createdCollection.value);
+      } catch (err) {
+        console.log(err);
+      }
+    });
 
     return {
-      valid,
-      wallet,
-      name,
-      symbol,
-      loyalty,
-      submit,
-      getCollection,
+      showForm,
+      linkedCollection,
+      createdCollection,
+      collectionAddress,
+      link,
+      unlink,
     };
   },
 };
