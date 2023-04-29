@@ -3,7 +3,7 @@
     <v-img height="194" :src="nft.tokenUri"></v-img>
     <v-card-title>{{ nft.name }}</v-card-title>
     <v-card-subtitle>{{ nft.desc }}</v-card-subtitle>
-    <div v-if="nft.price > 0">
+    <div v-if="nft.price">
       <v-card-text>Seller:</v-card-text>
       <v-card-subtitle> {{ nft.seller }}</v-card-subtitle>
     </div>
@@ -15,7 +15,7 @@
       <v-card-text>Collection:</v-card-text>
       <v-card-subtitle> {{ nft.collection }}</v-card-subtitle>
     </div>
-    <v-card-text>{{ nft.price }} ETH</v-card-text>
+    <v-card-text v-if="nft.price">{{ nft.price }} ETH</v-card-text>
     <v-card-text>{{ nft.royalty }} %</v-card-text>
     <v-card-actions class="d-flex justify-end">
       <v-btn class="me-2" variant="tonal" @click="$emit('onClose')">
@@ -24,6 +24,7 @@
       <v-btn
         color="primary"
         variant="outlined"
+        v-if="isOwner && !nft.price"
         @click="sell(nft.collection, nft.id)"
       >
         Sell
@@ -31,6 +32,7 @@
       <v-btn
         color="primary"
         variant="outlined"
+        v-if="nft.price"
         @click="buy(nft.collection, nft.id, nft.royalty, nft.price)"
       >
         Buy
@@ -38,6 +40,7 @@
       <v-btn
         color="primary"
         variant="outlined"
+        v-if="nft.price"
         @click="addCart(nft.collection, nft.id)"
       >
         Add Cart
@@ -46,7 +49,7 @@
   </v-card>
 </template>
 <script>
-import { ref } from "vue";
+import { ref, computed } from "vue";
 import axios from "axios";
 import { useMarketStore } from "@/stores/market";
 
@@ -54,9 +57,14 @@ export default {
   name: "View NFT",
   props: ["nft"],
   emits: ["onClose"],
-  setup() {
+  setup(props) {
     const { linkCollection, listNFT, buyNFT } = useMarketStore();
-
+    const isOwner = computed(() => {
+      const nftOwner = props.nft.owner;
+      if (nftOwner)
+        return sessionStorage.getItem("address") === nftOwner.toLowerCase();
+      else return false;
+    });
     const price = ref(0.00001);
     const sell = async (nftCollection, nftId) => {
       try {
@@ -126,6 +134,7 @@ export default {
     };
 
     return {
+      isOwner,
       sell,
       buy,
       addCart,

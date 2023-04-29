@@ -65,9 +65,8 @@
           <tbody>
             <tr v-for="item in ownedNFTs" :key="item.id">
               <td><v-img height="80" :src="item.tokenUri"></v-img></td>
-              <td>{{ item.name }}</td>
-              <td>{{ item.desc }}</td>
-              <td>{{ item.price }} ETH</td>
+              <td>{{ item.tokenName }}</td>
+              <td>{{ item.tokenDescription }}</td>
               <td>
                 <v-btn
                   color="accent"
@@ -91,8 +90,8 @@
       <v-col v-for="item in ownedNFTs" :key="item.id" :md="iconSize" cols="12">
         <v-card class="mx-auto py-2" max-width="344" variant="tonal">
           <v-img height="194" :src="item.tokenUri"></v-img>
-          <v-card-title>{{ item.name }}</v-card-title>
-          <v-card-subtitle>{{ item.desc }}</v-card-subtitle>
+          <v-card-title>{{ item.tokenName }}</v-card-title>
+          <v-card-subtitle>{{ item.tokenDescription }}</v-card-subtitle>
           <v-card-actions class="d-flex justify-space-between mx-2">
             <v-btn
               width="100%"
@@ -137,7 +136,7 @@ import filterMenu from "@/components/mySpace/filterMenu.vue";
 import ViewNFT from "@/components/mySpace/viewNFT.vue";
 
 export default {
-  name: "OwnedNFT",
+  tokenName: "OwnedNFT",
   props: ["userAddress"],
   components: {
     filterMenu,
@@ -164,21 +163,9 @@ export default {
 
     onMounted(async () => {
       const res = await getOwnedNFTs(props.userAddress);
-
-      console.log(res);
+      console.log("Owned", res);
       if (res) {
-        ownedNFTs.value = await Promise.all(
-          res.map(async (i) => {
-            let nft = {
-              id: i.tokenId,
-              tokenUri: i.tokenUri,
-              name: i.tokenName,
-              desc: i.tokenDescription,
-              collection: i.collection,
-            };
-            return nft;
-          })
-        );
+        ownedNFTs.value = res;
       }
     });
 

@@ -65,8 +65,8 @@
           <tbody>
             <tr v-for="item in listedNFTs" :key="item.tokenUri">
               <td><v-img height="80" :src="item.tokenUri"></v-img></td>
-              <td>{{ item.name }}</td>
-              <td>{{ item.desc }}</td>
+              <td>{{ item.tokenName }}</td>
+              <td>{{ item.tokenDescription }}</td>
               <td>{{ item.price }} ETH</td>
               <td>
                 <v-btn
@@ -96,8 +96,8 @@
       >
         <v-card class="mx-auto py-2" max-width="344" variant="tonal">
           <v-img height="194" :src="item.tokenUri"></v-img>
-          <v-card-title>{{ item.name }}</v-card-title>
-          <v-card-subtitle>{{ item.desc }}</v-card-subtitle>
+          <v-card-title>{{ item.tokenName }}</v-card-title>
+          <v-card-subtitle>{{ item.tokenDescription }}</v-card-subtitle>
           <v-card-text>{{ item.price }} ETH</v-card-text>
           <v-card-actions class="d-flex justify-space-between mx-2">
             <v-btn
@@ -143,7 +143,7 @@ import { useMarketStore } from "@/stores/market";
 import ViewNFT from "@/components/mySpace/viewNFT.vue";
 
 export default {
-  name: "OnSale",
+  tokenName: "OnSale",
   props: ["userAddress"],
   components: {
     filterMenu,
@@ -172,21 +172,8 @@ export default {
       try {
         const res = await getUserListedNFTs(props.userAddress);
         if (res) {
-          listedNFTs.value = await Promise.all(
-            res.map(async (i) => {
-              let nft = {
-                id: i.tokenId,
-                seller: i.seller,
-                price: i.price,
-                royalty: i.royalty,
-                tokenUri: i.tokenUri,
-                name: i.tokenName,
-                desc: i.tokenDescription,
-                collection: i.collection,
-              };
-              return nft;
-            })
-          );
+          listedNFTs.value = res;
+          console.log("On Sale", res);
         }
       } catch (err) {
         console.log(err);
