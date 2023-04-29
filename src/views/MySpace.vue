@@ -9,10 +9,10 @@
       </v-tabs>
       <v-window v-model="tab">
         <v-window-item :value="1">
-          <OwnedNFT />
+          <OwnedNFT :userAddress="userAddress" />
         </v-window-item>
         <v-window-item :value="2">
-          <OnSale />
+          <OnSale :userAddress="userAddress" />
         </v-window-item>
         <v-window-item :value="3">
           <Activity />
@@ -52,6 +52,7 @@ export default {
     const tab = ref(1);
     const route = useRoute();
     const userExist = ref(true);
+    const userAddress = route.params.address;
 
     onMounted(async () => {
       try {
@@ -69,6 +70,7 @@ export default {
     return {
       tab,
       userExist,
+      userAddress,
     };
   },
 };

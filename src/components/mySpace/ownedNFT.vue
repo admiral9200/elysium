@@ -138,14 +138,15 @@ import ViewNFT from "@/components/mySpace/viewNFT.vue";
 
 export default {
   name: "OwnedNFT",
+  props: ["userAddress"],
   components: {
     filterMenu,
     ViewNFT,
   },
-  setup() {
+  setup(props) {
     const { getOwnedNFTs } = useMarketStore();
-    var menu = ref(false);
-    var selectedView = ref("smallIcon");
+    const menu = ref(false);
+    const selectedView = ref("smallIcon");
     const showNFTDetail = ref(false);
 
     // computed
@@ -162,7 +163,7 @@ export default {
     };
 
     onMounted(async () => {
-      const res = await getOwnedNFTs(sessionStorage.getItem("address"));
+      const res = await getOwnedNFTs(props.userAddress);
 
       console.log(res);
       if (res) {
