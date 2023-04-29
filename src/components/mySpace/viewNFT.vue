@@ -11,13 +11,29 @@
       <v-card-text>Owner:</v-card-text>
       <v-card-subtitle> {{ nft.owner }}</v-card-subtitle>
     </div>
+    <div>
+      <v-card-text>Collection:</v-card-text>
+      <v-card-subtitle> {{ nft.collection }}</v-card-subtitle>
+    </div>
     <v-card-text>{{ nft.price }} ETH</v-card-text>
+    <v-card-text>{{ nft.royalty }} %</v-card-text>
     <v-card-actions class="d-flex justify-end">
       <v-btn class="me-2" variant="tonal" @click="$emit('onClose')">
         Close
       </v-btn>
-      <v-btn color="primary" variant="outlined" @click="sell(nft.id)">
+      <v-btn
+        color="primary"
+        variant="outlined"
+        @click="sell(nft.collection, nft.id)"
+      >
         Sell
+      </v-btn>
+      <v-btn
+        color="primary"
+        variant="outlined"
+        @click="buy(nft.collection, nft.id, nft.royalty, nft.price)"
+      >
+        Buy
       </v-btn>
       <v-btn
         color="primary"
@@ -39,18 +55,23 @@ export default {
   props: ["nft"],
   emits: ["onClose"],
   setup() {
-    const { getMyCollection, listNFT } = useMarketStore();
+    const { linkCollection, listNFT, buyNFT } = useMarketStore();
 
-    const price = ref(1);
-    const sell = async (nftId) => {
+    const price = ref(0.00001);
+    const sell = async (nftCollection, nftId) => {
       try {
-        const collectionAddress = await getMyCollection();
-        const res = await listNFT(
-          collectionAddress[0],
-          nftId,
-          price.value.toString()
-        );
+        const res = await listNFT(nftCollection, nftId, price.value.toString());
         console.log(res);
+      } catch (err) {
+        console.log(err);
+      }
+    };
+
+    const buy = async (nftCollection, nftId, nftRoyalty, nftPrice) => {
+      try {
+        const res = await buyNFT(nftCollection, nftId, nftRoyalty, nftPrice);
+        console.log(res);
+        await linkCollection(sessionStorage.getItem("address"), nftCollection);
       } catch (err) {
         console.log(err);
       }
@@ -76,10 +97,10 @@ export default {
         } else {
           nfts.value = res.data.cart_content;
           let exist = false;
-          for (let i = 0; i < nfts.value.length; i++) {
+          for (const element of nfts.value) {
             if (
-              nfts.value[i].collection === nftCollection &&
-              nfts.value[i].tokenId === nftId
+              element.collection === nftCollection &&
+              element.tokenId === nftId
             ) {
               exist = true;
               console.log("NFT already in cart");
@@ -106,6 +127,7 @@ export default {
 
     return {
       sell,
+      buy,
       addCart,
     };
   },
