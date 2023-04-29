@@ -16,16 +16,31 @@
       <v-card-subtitle> {{ nft.collection }}</v-card-subtitle>
     </div>
     <v-card-text v-if="nft.price">{{ nft.price }} ETH</v-card-text>
-    <v-card-text>{{ nft.royalty }} %</v-card-text>
+    <v-card-text>Royalty: {{ nft.royalty }} %</v-card-text>
+    <v-card-actions v-if="showForm">
+      <v-text-field
+        v-model="price"
+        label="Price"
+        variant="outlined"
+        density="compact"
+        suffix="ETH"
+        type="number"
+      ></v-text-field>
+    </v-card-actions>
     <v-card-actions class="d-flex justify-end">
-      <v-btn class="me-2" variant="tonal" @click="$emit('onClose')">
+      <v-btn
+        v-if="!showForm"
+        class="me-2"
+        variant="tonal"
+        @click="$emit('onClose')"
+      >
         Close
       </v-btn>
       <v-btn
         color="primary"
         variant="outlined"
-        v-if="isOwner && !nft.price"
-        @click="sell(nft.collection, nft.tokenId)"
+        v-if="isOwner && !nft.price && !showForm"
+        @click="showForm = true"
       >
         Sell
       </v-btn>
@@ -53,6 +68,15 @@
       >
         Add Cart
       </v-btn>
+      <v-btn v-if="showForm" @click="showForm = false">Cancel</v-btn>
+      <v-btn
+        v-if="showForm"
+        color="primary"
+        variant="tonal"
+        @click="sell(nft.collection, nft.tokenId)"
+      >
+        Confirm
+      </v-btn>
     </v-card-actions>
   </v-card>
 </template>
@@ -67,7 +91,8 @@ export default {
   emits: ["onClose"],
   setup(props) {
     const { linkCollection, listNFT, unListNFT, buyNFT } = useMarketStore();
-    const price = ref(0.00001);
+    const price = ref();
+    const showForm = ref(false);
 
     const isOwner = computed(() => {
       const nftOwner = props.nft.owner;
@@ -162,6 +187,8 @@ export default {
     return {
       isOwner,
       isSeller,
+      showForm,
+      price,
       sell,
       unList,
       buy,
