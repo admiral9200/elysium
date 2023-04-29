@@ -73,7 +73,8 @@ export const useMarketStore = defineStore("user", () => {
   const getLinkedCollection = async (user_address) => {
     try {
       const res = await axios.get("/api/collection/" + user_address);
-      return res.data;
+      if (res.data === "404") return [];
+      else return res.data;
     } catch (err) {
       console.log(err);
     }
