@@ -126,13 +126,18 @@ export default {
       }
       if (!exist) {
         const data = {
-          address: route.params.address,
-          collections: newCollections,
+          user_address: route.params.address,
+          nft_collection: newCollections,
         };
         console.log(newCollections);
+
         try {
-          const res = await axios.put("/api/user/collections/", data);
-          console.log(res);
+          const res = await axios.put("/api/collection/", data);
+          if (res.data === "404") {
+            const newCollection = await axios.post("/api/collection/", data);
+            console.log("new collection", newCollection);
+          }
+          console.log("update collection", res);
         } catch (err) {
           console.log(err);
         }
@@ -142,14 +147,13 @@ export default {
     const unlink = async (tokenIndex) => {
       let newCollections = linkedCollection.value;
       newCollections.splice(tokenIndex, 1);
-      newCollections.splice(tokenIndex, 1);
       const data = {
-        address: route.params.address,
-        collections: newCollections,
+        user_address: route.params.address,
+        nft_collection: newCollections,
       };
       try {
-        const res = await axios.put("/api/user/collections/", data);
-        console.log(res);
+        const res = await axios.put("/api/collection/", data);
+        console.log("res", res);
       } catch (err) {
         console.log(err);
       }
@@ -157,11 +161,11 @@ export default {
 
     onMounted(async () => {
       try {
-        const res = await axios.get(
-          "/api/user/collections/" + route.params.address
-        );
-        linkedCollection.value = res.data;
-        console.log("linked", linkedCollection.value);
+        const res = await axios.get("/api/collection/" + route.params.address);
+        if (res.data != "404") {
+          linkedCollection.value = res.data;
+          console.log("linked", linkedCollection.value);
+        }
       } catch (err) {
         console.log(err);
       }
