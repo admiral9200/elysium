@@ -272,17 +272,40 @@ export const useMarketStore = defineStore("user", () => {
           nftContractABI.abi,
           signer
         );
-        console.log(signer, await nftContract.ownerOf(tokenId));
         const approveTxn = await nftContract.approve(
           marketContractAddress,
           tokenId
         );
         await approveTxn.wait();
-        console.log("approveTxn", approveTxn);
         const tokenTxn = await marketContract.listNft(
           tokenAddress,
           tokenId,
           ethers.parseUnits(price, "ether")
+        );
+        return await tokenTxn.wait();
+      } else {
+        console.log("Ethereum object doesn't exist!");
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const unListNFT = async (tokenAddress, tokenId) => {
+    try {
+      console.log("tokenTxn", tokenAddress, tokenId);
+
+      if (window.ethereum != null) {
+        const provider = new ethers.BrowserProvider(window.ethereum);
+        const signer = await provider.getSigner();
+        const marketContract = new ethers.Contract(
+          marketContractAddress,
+          marketContractABI.abi,
+          signer
+        );
+        const tokenTxn = await marketContract.cancelListNFT(
+          tokenAddress,
+          tokenId
         );
         return await tokenTxn.wait();
       } else {
@@ -454,6 +477,7 @@ export const useMarketStore = defineStore("user", () => {
     mintNFT,
     getOwnedNFTs,
     listNFT,
+    unListNFT,
     getListedNFTs,
     getUserListedNFTs,
     getCartNFTs,

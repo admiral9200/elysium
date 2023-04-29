@@ -25,23 +25,31 @@
         color="primary"
         variant="outlined"
         v-if="isOwner && !nft.price"
-        @click="sell(nft.collection, nft.id)"
+        @click="sell(nft.collection, nft.tokenId)"
       >
         Sell
       </v-btn>
       <v-btn
+        color="red"
+        variant="outlined"
+        v-if="isSeller && nft.price"
+        @click="unList(nft.collection, nft.tokenId)"
+      >
+        Cancel Sell
+      </v-btn>
+      <v-btn
         color="primary"
         variant="outlined"
-        v-if="nft.price"
-        @click="buy(nft.collection, nft.id, nft.royalty, nft.price)"
+        v-if="!isSeller && nft.price"
+        @click="buy(nft.collection, nft.tokenId, nft.royalty, nft.price)"
       >
         Buy
       </v-btn>
       <v-btn
         color="primary"
         variant="outlined"
-        v-if="nft.price"
-        @click="addCart(nft.collection, nft.id)"
+        v-if="!isSeller && nft.price"
+        @click="addCart(nft.collection, nft.tokenId)"
       >
         Add Cart
       </v-btn>
@@ -58,17 +66,35 @@ export default {
   props: ["nft"],
   emits: ["onClose"],
   setup(props) {
-    const { linkCollection, listNFT, buyNFT } = useMarketStore();
+    const { linkCollection, listNFT, unListNFT, buyNFT } = useMarketStore();
+    const price = ref(0.00001);
+
     const isOwner = computed(() => {
       const nftOwner = props.nft.owner;
       if (nftOwner)
         return sessionStorage.getItem("address") === nftOwner.toLowerCase();
       else return false;
     });
-    const price = ref(0.00001);
+
+    const isSeller = computed(() => {
+      const nftSeller = props.nft.seller;
+      if (nftSeller)
+        return sessionStorage.getItem("address") === nftSeller.toLowerCase();
+      else return false;
+    });
+
     const sell = async (nftCollection, nftId) => {
       try {
         const res = await listNFT(nftCollection, nftId, price.value.toString());
+        console.log(res);
+      } catch (err) {
+        console.log(err);
+      }
+    };
+
+    const unList = async (nftCollection, nftId) => {
+      try {
+        const res = await unListNFT(nftCollection, nftId);
         console.log(res);
       } catch (err) {
         console.log(err);
@@ -135,7 +161,9 @@ export default {
 
     return {
       isOwner,
+      isSeller,
       sell,
+      unList,
       buy,
       addCart,
     };
