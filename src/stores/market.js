@@ -216,32 +216,35 @@ export const useMarketStore = defineStore("user", () => {
       const { ethereum } = window;
       if (ethereum) {
         const provider = new ethers.BrowserProvider(ethereum);
-        const nftAddress = await getMyCollection();
+        const linkedCollection = await getLinkedCollection(address);
         const signer = await provider.getSigner();
-        const nftContract = new ethers.Contract(
-          nftAddress[0],
-          nftContractABI.abi,
-          signer
-        );
 
         const nfts = [];
-        const balance = await nftContract.balanceOf(address);
-        for (let i = 0; i < balance; i++) {
-          const tokenId = await nftContract.tokenOfOwnerByIndex(address, i);
-          const owner = await nftContract.ownerOf(tokenId);
-          const tokenHash = await nftContract.tokenURI(tokenId);
-          const meta = await getTokenMeta(tokenHash);
-          const imgHash = meta.image;
-          let nft = {
-            owner: owner,
-            collection: nftAddress[0],
-            tokenId: tokenId.toString(),
-            tokenUri: "https://ipfs.io/ipfs/" + imgHash,
-            tokenName: meta.name,
-            tokenDescription: meta.description,
-            tokenRoyalty: meta.royalty,
-          };
-          nfts.push(nft);
+        for (const tokenAddress of linkedCollection) {
+          const nftContract = new ethers.Contract(
+            tokenAddress,
+            nftContractABI.abi,
+            signer
+          );
+
+          const balance = await nftContract.balanceOf(address);
+          for (let i = 0; i < balance; i++) {
+            const tokenId = await nftContract.tokenOfOwnerByIndex(address, i);
+            const owner = await nftContract.ownerOf(tokenId);
+            const tokenHash = await nftContract.tokenURI(tokenId);
+            const meta = await getTokenMeta(tokenHash);
+            const imgHash = meta.image;
+            let nft = {
+              owner: owner,
+              collection: tokenAddress,
+              tokenId: tokenId.toString(),
+              tokenUri: "https://ipfs.io/ipfs/" + imgHash,
+              tokenName: meta.name,
+              tokenDescription: meta.description,
+              tokenRoyalty: meta.royalty,
+            };
+            nfts.push(nft);
+          }
         }
         if (nfts.length > 0) {
           return nfts;
@@ -327,6 +330,7 @@ export const useMarketStore = defineStore("user", () => {
             tokenUri: "https://ipfs.io/ipfs/" + imgHash,
             tokenName: meta.name,
             tokenDescription: meta.description,
+            collection: collectionAddress,
           };
           nfts.push(nft);
         }
@@ -341,20 +345,25 @@ export const useMarketStore = defineStore("user", () => {
     }
   };
 
-  const getAllListedNFTs = async (collectionAddress) => {
+  const getUserListedNFTs = async (address) => {
+    let allNfts = [];
     let nfts = [];
+    const collectionAddress = await getLinkedCollection(address);
     for (const collection of collectionAddress) {
       const res = await getListedNFTs(collection);
       if (res) {
-        nfts = nfts.concat(res);
+        allNfts = allNfts.concat(res);
       }
     }
-    if (nfts.length > 0) {
+    if (allNfts.length > 0) {
+      for (const nft of allNfts) {
+        if (nft.seller.toLowerCase() === address) {
+          nfts.push(nft);
+        }
+      }
       return nfts;
     } else return null;
   };
-
-  //TODO getAllListedNFTs by a single seller
 
   const getCartNFTs = async (cartContent) => {
     try {
@@ -446,7 +455,7 @@ export const useMarketStore = defineStore("user", () => {
     getOwnedNFTs,
     listNFT,
     getListedNFTs,
-    getAllListedNFTs,
+    getUserListedNFTs,
     getCartNFTs,
     buyNFT,
   };

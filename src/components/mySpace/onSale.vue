@@ -144,14 +144,15 @@ import ViewNFT from "@/components/mySpace/viewNFT.vue";
 
 export default {
   name: "OnSale",
+  props: ["userAddress"],
   components: {
     filterMenu,
     ViewNFT,
   },
-  setup() {
-    const { getMyCollection, getListedNFTs } = useMarketStore();
-    var menu = ref(false);
-    var selectedView = ref("smallIcon");
+  setup(props) {
+    const { getUserListedNFTs } = useMarketStore();
+    const menu = ref(false);
+    const selectedView = ref("smallIcon");
     const showNFTDetail = ref(false);
 
     // computed
@@ -169,8 +170,7 @@ export default {
 
     onMounted(async () => {
       try {
-        const collectionAddress = await getMyCollection();
-        const res = await getListedNFTs(collectionAddress[0]);
+        const res = await getUserListedNFTs(props.userAddress);
         if (res) {
           listedNFTs.value = await Promise.all(
             res.map(async (i) => {
@@ -178,10 +178,11 @@ export default {
                 id: i.tokenId,
                 seller: i.seller,
                 price: i.price,
+                royalty: i.royalty,
                 tokenUri: i.tokenUri,
                 name: i.tokenName,
                 desc: i.tokenDescription,
-                collection: collectionAddress[0],
+                collection: i.collection,
               };
               return nft;
             })
