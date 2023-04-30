@@ -92,7 +92,7 @@ export default {
       {
         text: "My Collection",
         icon: "mdi-cards",
-        link: "/collection/" + sessionStorage.getItem("address"),
+        link: "/user/collection/" + sessionStorage.getItem("address"),
       },
       {
         text: "Create NFT",
