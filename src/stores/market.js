@@ -79,6 +79,31 @@ export const useMarketStore = defineStore("user", () => {
     }
   };
 
+  const getAllLinkedCollection = async () => {
+    try {
+      const res = await axios.get("/api/collection/");
+      if (res.data === "404") return [];
+      else {
+        console.log("res", res.data);
+        // return res.data;
+      }
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
+  const getTopCollection = async () => {
+    try {
+      const res = await axios.get("/api/collection/topCollection");
+      if (res.data === "404") return [];
+      else {
+        return res.data;
+      }
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
   const unlinkCollection = async (user_address, tokenIndex) => {
     let newCollections = await getLinkedCollection(user_address);
     newCollections.splice(tokenIndex, 1);
@@ -199,13 +224,16 @@ export const useMarketStore = defineStore("user", () => {
           nftContractABI.abi,
           signer
         );
-        let collection = {
+        //TODO check if collection exists
+        const royaltyFee = await nftContract.getRoyalty();
+        const collection = {
           address: collectionAddress,
           name: await nftContract.name(),
           symbol: await nftContract.symbol(),
-          royalty: await nftContract.getRoyalty(),
+          royalty: BigInt(royaltyFee).toString(),
           royaltyRecipient: await nftContract.getRoyaltyRecipient(),
         };
+        console.log("collection", collection);
         return collection;
       } else {
         console.log("Ethereum object doesn't exist!");
@@ -534,6 +562,8 @@ export const useMarketStore = defineStore("user", () => {
     connectWallet,
     linkCollection,
     getLinkedCollection,
+    getAllLinkedCollection,
+    getTopCollection,
     unlinkCollection,
     uploadFileToIPFS,
     uploadJSONToIPFS,
