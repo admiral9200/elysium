@@ -287,6 +287,46 @@ export const useMarketStore = defineStore("user", () => {
     }
   };
 
+  const getCollectionNFTs = async (tokenAddress) => {
+    try {
+      if (window.ethereum) {
+        const provider = new ethers.BrowserProvider(window.ethereum);
+        const signer = await provider.getSigner();
+        const nfts = [];
+        const nftContract = new ethers.Contract(
+          tokenAddress,
+          nftContractABI.abi,
+          signer
+        );
+        const totalSupply = await nftContract.totalSupply();
+        for (let i = 0; i < totalSupply; i++) {
+          const tokenId = await nftContract.tokenByIndex(i);
+          const owner = await nftContract.ownerOf(tokenId);
+          const tokenHash = await nftContract.tokenURI(tokenId);
+          const meta = await getTokenMeta(tokenHash);
+          const imgHash = meta.image;
+          let nft = {
+            owner: owner,
+            collection: tokenAddress,
+            tokenId: tokenId.toString(),
+            tokenUri: "https://ipfs.io/ipfs/" + imgHash,
+            tokenName: meta.name,
+            tokenDescription: meta.description,
+            tokenRoyalty: meta.royalty,
+          };
+          nfts.push(nft);
+        }
+        if (nfts.length > 0) {
+          return nfts;
+        } else return null;
+      } else {
+        console.log("Ethereum object doesn't exist!");
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
   const listNFT = async (tokenAddress, tokenId, price) => {
     try {
       if (window.ethereum) {
@@ -502,6 +542,7 @@ export const useMarketStore = defineStore("user", () => {
     getCollectionDetails,
     mintNFT,
     getOwnedNFTs,
+    getCollectionNFTs,
     listNFT,
     unListNFT,
     getListedNFTs,

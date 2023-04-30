@@ -25,6 +25,14 @@ const routes = [
     component: () =>
       import(/* webpackChunkName: "CreateNFT" */ "@/views/CreateNFT.vue"),
   },
+  {
+    path: "/collection/:address",
+    name: "Collection",
+    component: () =>
+      import(
+        /* webpackChunkName: "CollectionPage" */ "@/views/CollectionPage.vue"
+      ),
+  },
 ];
 
 const router = createRouter({
