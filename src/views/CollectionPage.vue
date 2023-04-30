@@ -64,19 +64,6 @@ export default {
     const collectionExist = ref(true);
     const collectionDetails = ref({});
 
-    // onMounted(async () => {
-    //   try {
-    //     const res = await axios.get("/api/collection/" + route.params.address);
-    //     if (res.data === "404") {
-    //       collectionExist.value = false;
-    //     } else {
-    //       collectionExist.value = true;
-    //     }
-    //   } catch (error) {
-    //     console.error(error);
-    //   }
-    // });
-
     onMounted(async () => {
       try {
         collectionDetails.value = await getCollectionDetails(
