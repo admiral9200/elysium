@@ -38,7 +38,7 @@
               ></v-textarea>
               <div class="d-flex justify-space-between align-center">
                 <div>
-                  <v-label>Put on Sale</v-label>
+                  <v-label>List it for Sale on Elysium?</v-label>
                 </div>
                 <div>
                   <v-switch
@@ -62,18 +62,6 @@
                 required
                 v-if="onSale === 'Yes'"
               ></v-text-field>
-              <v-text-field
-                v-model="loyalty"
-                label="Loyalty"
-                variant="outlined"
-                density="compact"
-                suffix="%"
-                type="number"
-                min="0"
-                max="50"
-                dirty
-                required
-              ></v-text-field>
               <div class="d-flex justify-space-between align-center">
                 <div>
                   <v-label>Free Minting</v-label>
@@ -85,6 +73,7 @@
                     false-value="No"
                     color="white"
                     density="compact"
+                    disabled
                   ></v-switch>
                 </div>
               </div>
@@ -108,7 +97,6 @@
           <v-card-text v-if="onSale === 'Yes'">
             Price: {{ price }} ETH
           </v-card-text>
-          <v-card-text> Loyalty: {{ loyalty }} % </v-card-text>
           <v-card-text> Free Minting: {{ freeMint }} </v-card-text>
         </v-card>
       </v-col>
@@ -124,16 +112,20 @@ export default {
   name: "CreateNFT",
   components: {},
   setup() {
-    const { uploadFileToIPFS, uploadJSONToIPFS, getMyCollection, mintNFT } =
-      useMarketStore();
+    const {
+      uploadFileToIPFS,
+      uploadJSONToIPFS,
+      getMyCollection,
+      mintNFT,
+      listNFT,
+    } = useMarketStore();
     // data
     const valid = ref(false);
     const wallet = ref("0x2e8cf6a2a42C7F9c95136845fEf36798efA487d3");
     const name = ref("");
     const description = ref("");
     const onSale = ref("No");
-    const price = ref("");
-    const loyalty = ref("");
+    const price = ref();
     const freeMint = ref("No");
     const file = ref("");
     const previewImg = computed(() => {
@@ -151,29 +143,36 @@ export default {
         name: name.value,
         description: description.value,
         image: fileData.IpfsHash,
-        // loyalty: loyalty.value, //??? shud put here or the chain
       };
       const jsonFile = await uploadJSONToIPFS(json);
       console.log("file", jsonFile.IpfsHash);
       const collectionAddress = await getMyCollection();
-      const mint = await mintNFT(
+      const tokenId = await mintNFT(
         sessionStorage.getItem("address"),
         collectionAddress[0],
         jsonFile.IpfsHash
       );
       // const collectionAddress = await getMyCollection();
-      // const mint = await mintNFT(
+      // const tokenId = await mintNFT(
       //   sessionStorage.getItem("address"),
       //   collectionAddress[0],
       //   "QmRaWcj4SsKuYyaemp7upnjHxk44AtC13JBvzwGH3YbJzc"
       // );
 
-      console.log("mint", mint);
+      console.log("mint", tokenId);
 
-      // if(onSale){
-      //TODO if set on sale, list the nft
-      //   const list = await
-      // }
+      if (onSale.value === "Yes") {
+        try {
+          const res = await listNFT(
+            collectionAddress[0],
+            tokenId,
+            price.value.toString()
+          );
+          console.log("listed on sale", res);
+        } catch (err) {
+          console.log(err);
+        }
+      }
     };
 
     return {
@@ -183,7 +182,6 @@ export default {
       description,
       onSale,
       price,
-      loyalty,
       freeMint,
       file,
       previewImg,

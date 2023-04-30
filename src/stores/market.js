@@ -200,8 +200,14 @@ export const useMarketStore = defineStore("user", () => {
           nftContractABI.abi,
           signer
         );
+        nftContract.on("Transfer", (from, to, tokenId) => {
+          console.log(`Token ${tokenId} transferred from ${from} to ${to}`);
+        });
         const tokenTxn = await nftContract.safeMint(ownerAddress, tokenURI);
-        return await tokenTxn.wait();
+        const receipt = await tokenTxn.wait();
+        const tokenId = receipt.logs[0].topics[3];
+        console.log(`TokenId: ${tokenId}`);
+        return tokenId;
       } else {
         console.log("Ethereum object doesn't exist!");
       }
