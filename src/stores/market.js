@@ -189,6 +189,32 @@ export const useMarketStore = defineStore("user", () => {
     }
   };
 
+  const getCollectionDetails = async (collectionAddress) => {
+    try {
+      if (window.ethereum) {
+        const provider = new ethers.BrowserProvider(window.ethereum);
+        const signer = await provider.getSigner();
+        const nftContract = new ethers.Contract(
+          collectionAddress,
+          nftContractABI.abi,
+          signer
+        );
+        let collection = {
+          address: collectionAddress,
+          name: await nftContract.name(),
+          symbol: await nftContract.symbol(),
+          royalty: await nftContract.getRoyalty(),
+          royaltyRecipient: await nftContract.getRoyaltyRecipient(),
+        };
+        return collection;
+      } else {
+        console.log("Ethereum object doesn't exist!");
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
   const mintNFT = async (ownerAddress, collectionAddress, tokenURI) => {
     console.log("collection", collectionAddress);
     try {
@@ -473,6 +499,7 @@ export const useMarketStore = defineStore("user", () => {
     uploadJSONToIPFS,
     createNFTCollection,
     getMyCollection,
+    getCollectionDetails,
     mintNFT,
     getOwnedNFTs,
     listNFT,
