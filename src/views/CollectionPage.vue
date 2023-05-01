@@ -19,10 +19,10 @@
       </v-tabs>
       <v-window v-model="tab">
         <v-window-item :value="1">
-          <AllNFT :collectionAddress="collectionDetails.address" />
+          <AllNFT :collectionAddress="collectionAddress" />
         </v-window-item>
         <v-window-item :value="2">
-          <OnSale :collectionAddress="collectionDetails.address" />
+          <OnSale :collectionAddress="collectionAddress" />
         </v-window-item>
         <v-window-item :value="3">
           <Activity />
@@ -61,14 +61,13 @@ export default {
     const { getCollectionDetails } = useMarketStore();
     const tab = ref(1);
     const route = useRoute();
+    const collectionAddress = route.params.address;
     const collectionExist = ref(true);
     const collectionDetails = ref({});
 
     onMounted(async () => {
       try {
-        collectionDetails.value = await getCollectionDetails(
-          route.params.address
-        );
+        collectionDetails.value = await getCollectionDetails(collectionAddress);
       } catch (error) {
         console.error(error);
       }
@@ -77,6 +76,7 @@ export default {
     return {
       tab,
       collectionExist,
+      collectionAddress,
       collectionDetails,
     };
   },
