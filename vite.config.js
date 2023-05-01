@@ -29,11 +29,12 @@ export default defineConfig({
     extensions: [".js", ".json", ".jsx", ".mjs", ".ts", ".tsx", ".vue"],
   },
   server: {
-    port: process.env.PORT || 3000,
     proxy: {
       "/api": {
         target: process.env.ELYSIUM_API_URL || "http://localhost:3001",
         changeOrigin: true,
+        secure: false,
+        ws: true,
         rewrite: (path) => path.replace(/^\/api/, ""),
       },
     },
