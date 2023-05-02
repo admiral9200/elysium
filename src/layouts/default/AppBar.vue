@@ -70,7 +70,7 @@
 </template>
 
 <script>
-import { ref, onMounted } from "vue";
+import { ref, onMounted, computed } from "vue";
 import { useRouter } from "vue-router";
 import axios from "axios";
 import { useMarketStore } from "@/stores/market";
@@ -119,7 +119,7 @@ export default {
       },
     ];
 
-    var pfp_url = ref("");
+    const pfp_url = ref("");
     const isConnected = ref(false);
     const router = useRouter();
 
@@ -131,9 +131,7 @@ export default {
         isConnected.value = true;
       }
       // if (window.ethereum) {
-      //   const _acc = await web3.eth.requestAccounts();
-      //   accounts = _acc.slice();
-      //   isConnected.value = true;
+      //   login();
       // }
     });
 
@@ -158,23 +156,12 @@ export default {
       }
     };
 
-    function logout() {
+    const logout = () => {
       sessionStorage.clear();
       //TODO clear account.value in pinia and disconnect wallet
       isConnected.value = false;
       router.push("/");
-    }
-
-    // const connectMetamask = async () => {
-    //   try {
-    //     const _acc = await web3.eth.requestAccounts();
-    //     address.value = _acc.slice();
-    //     sessionStorage.setItem("address", address.value[0]);
-    //     login();
-    //   } catch (error) {
-    //     console.error(error);
-    //   }
-    // };
+    };
 
     return {
       menu,
