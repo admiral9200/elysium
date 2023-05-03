@@ -284,10 +284,12 @@ export const useMarketStore = defineStore("user", () => {
           );
 
           const balance = await nftContract.balanceOf(address);
+          console.log("Total NFTs owned:", balance.toString());
           for (let i = 0; i < balance; i++) {
             const tokenId = await nftContract.tokenOfOwnerByIndex(address, i);
             const owner = await nftContract.ownerOf(tokenId);
             const tokenHash = await nftContract.tokenURI(tokenId);
+            console.log("Getting nft #" + i + " meta data...");
             const meta = await getTokenMeta(tokenHash);
             const imgHash = meta.image;
             let nft = {
@@ -324,10 +326,12 @@ export const useMarketStore = defineStore("user", () => {
           provider
         );
         const totalSupply = await nftContract.totalSupply();
+        console.log("Total NFTs in collection:", totalSupply.toString());
         for (let i = 0; i < totalSupply; i++) {
           const tokenId = await nftContract.tokenByIndex(i);
           const owner = await nftContract.ownerOf(tokenId);
           const tokenHash = await nftContract.tokenURI(tokenId);
+          console.log("Getting nft #" + i + " meta data...");
           const meta = await getTokenMeta(tokenHash);
           const imgHash = meta.image;
           let nft = {
@@ -371,7 +375,9 @@ export const useMarketStore = defineStore("user", () => {
           marketContractAddress,
           tokenId
         );
+        console.log("Approving transaction...");
         await approveTxn.wait();
+        console.log("Approved!");
         const tokenTxn = await marketContract.listNft(
           tokenAddress,
           tokenId,
@@ -425,6 +431,7 @@ export const useMarketStore = defineStore("user", () => {
         );
         const nfts = [];
         const balance = await nftContract.balanceOf(marketContractAddress);
+        console.log("Total NFTs listed:", balance.toString());
         for (let i = 0; i < balance; i++) {
           const tokenId = await nftContract.tokenOfOwnerByIndex(
             marketContractAddress,
@@ -435,6 +442,7 @@ export const useMarketStore = defineStore("user", () => {
             tokenId
           );
           const tokenHash = await nftContract.tokenURI(tokenId);
+          console.log("Getting nft #" + i + " meta data...");
           const meta = await getTokenMeta(tokenHash);
           const imgHash = meta.image;
           let nft = {
@@ -471,6 +479,7 @@ export const useMarketStore = defineStore("user", () => {
     }
     if (allNfts.length > 0) {
       for (const nft of allNfts) {
+        console.log("Searching for nfts listed by user...");
         if (nft.seller.toLowerCase() === address) {
           nfts.push(nft);
         }
@@ -500,6 +509,7 @@ export const useMarketStore = defineStore("user", () => {
             item.tokenId
           );
           const tokenHash = await nftContract.tokenURI(item.tokenId);
+          console.log("Getting nft #" + i + " meta data...");
           const meta = await getTokenMeta(tokenHash);
           const imgHash = meta.image;
           let nft = {
