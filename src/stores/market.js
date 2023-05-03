@@ -218,11 +218,10 @@ export const useMarketStore = defineStore("user", () => {
     try {
       if (window.ethereum) {
         const provider = new ethers.BrowserProvider(window.ethereum);
-        const signer = await provider.getSigner();
         const nftContract = new ethers.Contract(
           collectionAddress,
           nftContractABI.abi,
-          signer
+          provider
         );
         //TODO check if collection exists
         const royaltyFee = await nftContract.getRoyalty();
@@ -275,14 +274,13 @@ export const useMarketStore = defineStore("user", () => {
       if (window.ethereum) {
         const provider = new ethers.BrowserProvider(window.ethereum);
         const linkedCollection = await getLinkedCollection(address);
-        const signer = await provider.getSigner();
 
         const nfts = [];
         for (const tokenAddress of linkedCollection) {
           const nftContract = new ethers.Contract(
             tokenAddress,
             nftContractABI.abi,
-            signer
+            provider
           );
 
           const balance = await nftContract.balanceOf(address);
@@ -319,12 +317,11 @@ export const useMarketStore = defineStore("user", () => {
     try {
       if (window.ethereum) {
         const provider = new ethers.BrowserProvider(window.ethereum);
-        const signer = await provider.getSigner();
         const nfts = [];
         const nftContract = new ethers.Contract(
           tokenAddress,
           nftContractABI.abi,
-          signer
+          provider
         );
         const totalSupply = await nftContract.totalSupply();
         for (let i = 0; i < totalSupply; i++) {
@@ -416,16 +413,15 @@ export const useMarketStore = defineStore("user", () => {
     try {
       if (window.ethereum) {
         const provider = new ethers.BrowserProvider(window.ethereum);
-        const signer = await provider.getSigner();
         const marketContract = new ethers.Contract(
           marketContractAddress,
           marketContractABI.abi,
-          signer
+          provider
         );
         const nftContract = new ethers.Contract(
           collectionAddress,
           nftContractABI.abi,
-          signer
+          provider
         );
         const nfts = [];
         const balance = await nftContract.balanceOf(marketContractAddress);
@@ -487,18 +483,17 @@ export const useMarketStore = defineStore("user", () => {
     try {
       if (window.ethereum) {
         const provider = new ethers.BrowserProvider(window.ethereum);
-        const signer = await provider.getSigner();
         const marketContract = new ethers.Contract(
           marketContractAddress,
           marketContractABI.abi,
-          signer
+          provider
         );
         const nfts = [];
         for (const item of cartContent) {
           const nftContract = new ethers.Contract(
             item.collection,
             nftContractABI.abi,
-            signer
+            provider
           );
           const marketItem = await marketContract.getListedNFT(
             item.collection,
