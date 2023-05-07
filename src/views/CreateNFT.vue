@@ -87,12 +87,6 @@
                 </div>
               </div>
             </v-card-text>
-            <v-card-actions class="d-flex justify-end">
-              <v-btn color="error" variant="tonal"> Reset </v-btn>
-              <v-btn color="primary" variant="tonal" @click="submit">
-                Create
-              </v-btn>
-            </v-card-actions>
           </v-form>
         </v-card>
       </v-col>
@@ -109,6 +103,15 @@
           </v-card-text>
           <v-card-text> Free Minting: {{ freeMint }} </v-card-text>
         </v-card>
+        <v-btn
+          class="my-3 bg-primary text-white"
+          variant="tonal"
+          block="true"
+          @click="submit"
+        >
+          Mint
+        </v-btn>
+        <v-btn variant="tonal" block="true" @click="reset"> Reset </v-btn>
       </v-col>
     </v-row>
   </v-container>
@@ -198,6 +201,15 @@ export default {
       }
     };
 
+    const reset = () => {
+      name.value = "";
+      description.value = "";
+      onSale.value = "No";
+      price.value = "";
+      freeMint.value = "No";
+      file.value = "";
+    };
+
     onMounted(async () => {
       const res = await getMyCollection();
       collections.value = res;
@@ -223,6 +235,7 @@ export default {
       file,
       previewImg,
       submit,
+      reset,
     };
   },
 };
