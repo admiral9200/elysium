@@ -559,7 +559,6 @@ export const useMarketStore = defineStore("user", () => {
     linkCollection,
     getLinkedCollection,
     getAllLinkedCollection,
-    getTopCollection,
     unlinkCollection,
     uploadFileToIPFS,
     uploadJSONToIPFS,
