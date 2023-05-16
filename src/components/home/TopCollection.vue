@@ -30,9 +30,9 @@ export default {
         const res = await axios.get("/api/collection/topCollection");
 
         if (res.status === 200) {
-          for (let i = 0; i < res.data.length; i++) {
-            let collectionItem = await getCollectionDetails(res.data[i][0]);
-            collectionItem.link = `/collection/${res.data[i][0]}`;
+          for (const item of res.data) {
+            let collectionItem = await getCollectionDetails(item[0]);
+            collectionItem.link = `/collection/${item[0]}`;
             topCollections.value.push(collectionItem);
           }
         }
