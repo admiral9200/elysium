@@ -134,9 +134,7 @@ export default {
     onMounted(async () => {
       try {
         const res = await axios.get("/api/user/" + route.params.address);
-        if (res.data === "User not found") {
-          console.log("User not found");
-        } else {
+        if (res.status === 200) {
           user.value = res.data;
           let original_address = res.data.address;
           let truncated_address1 = original_address.substring(0, 5);

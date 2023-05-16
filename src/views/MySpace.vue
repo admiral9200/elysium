@@ -57,12 +57,11 @@ export default {
     onMounted(async () => {
       try {
         const res = await axios.get("/api/user/" + route.params.address);
-        if (res.data === "User not found") {
-          userExist.value = false;
-        } else {
-          userExist.value = true;
-        }
+        if (res.status === 200) userExist.value = true;
       } catch (error) {
+        if (error.response.status === 404) {
+          userExist.value = false;
+        }
         console.error(error);
       }
     });

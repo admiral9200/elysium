@@ -72,9 +72,11 @@ export const useMarketStore = defineStore("user", () => {
   const getLinkedCollection = async (user_address) => {
     try {
       const res = await axios.get("/api/collection/" + user_address);
-      if (res.data === "404") return [];
-      else return res.data;
+      if (res.status === 200) return res.data;
     } catch (err) {
+      if (err.response.status === 404) {
+        return [];
+      }
       console.log(err);
     }
   };
@@ -82,12 +84,13 @@ export const useMarketStore = defineStore("user", () => {
   const getAllLinkedCollection = async () => {
     try {
       const res = await axios.get("/api/collection/");
-      if (res.data === "404") return [];
-      else {
-        console.log("res", res.data);
-        // return res.data;
+      if (res.status === 200) {
+        return res.data;
       }
     } catch (err) {
+      if (err.response.status === 404) {
+        return [];
+      }
       console.log(err);
     }
   };
@@ -95,11 +98,13 @@ export const useMarketStore = defineStore("user", () => {
   const getTopCollection = async () => {
     try {
       const res = await axios.get("/api/collection/topCollection");
-      if (res.data === "404") return [];
-      else {
+      if (res.status === 200) {
         return res.data;
       }
     } catch (err) {
+      if (err.response.status === 404) {
+        return [];
+      }
       console.log(err);
     }
   };
