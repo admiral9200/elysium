@@ -81,7 +81,23 @@
       >
         Edit Profile
       </v-btn>
-      <v-btn class="mx-2" width="80%" color="white" v-else>Follow</v-btn>
+      <v-btn
+        class="mx-2"
+        width="80%"
+        color="white"
+        @click="follow(user.address)"
+        v-else-if="canFollow"
+        >Follow
+      </v-btn>
+      <v-btn
+        class="mx-2"
+        width="80%"
+        variant="outlined"
+        color="white"
+        @click="unfollow(user.address)"
+        v-else
+        >Unfollow
+      </v-btn>
     </v-col>
   </v-row>
   <v-overlay
@@ -129,6 +145,35 @@ export default {
     const following = 20;
     const showEditProfile = ref(false);
     const showUploadProfile = ref(false);
+    const canFollow = ref(true);
+
+    const follow = async (target_address) => {
+      try {
+        const res = await axios.put("/api/user/follow", {
+          user_address: sessionStorage.getItem("address"),
+          target_address: target_address,
+        });
+        console.log(res);
+        canFollow.value = false;
+      } catch (err) {
+        console.log(err);
+        console.log(err.response.message);
+      }
+    };
+
+    const unfollow = async (target_address) => {
+      try {
+        const res = await axios.put("/api/user/unfollow", {
+          user_address: sessionStorage.getItem("address"),
+          target_address: target_address,
+        });
+        console.log(res);
+        canFollow.value = true;
+      } catch (err) {
+        console.log(err);
+        console.log(err.response.message);
+      }
+    };
 
     // onMounted async because it take time for the parent component to fetch data
     onMounted(async () => {
@@ -147,6 +192,20 @@ export default {
       } catch (error) {
         console.error(error);
       }
+
+      try {
+        console.log("session", sessionStorage.getItem("address"));
+        const res = await axios.post("/api/user/follow/check", {
+          user_address: sessionStorage.getItem("address"),
+          target_address: route.params.address,
+        });
+        if (res.data === true) {
+          canFollow.value = false;
+        }
+      } catch (err) {
+        console.log(err);
+        console.log(err.response.data.message);
+      }
     });
 
     const canEdit = computed(() => {
@@ -162,6 +221,9 @@ export default {
       showEditProfile,
       showUploadProfile,
       canEdit,
+      canFollow,
+      follow,
+      unfollow,
     };
   },
 };
