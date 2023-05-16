@@ -16,26 +16,30 @@
 
 <script>
 import { ref, onMounted } from "vue";
+import axios from "axios";
 import { useMarketStore } from "@/stores/market";
 
 export default {
   name: "TopCollection",
   setup() {
-    const { getTopCollection, getCollectionDetails } = useMarketStore();
+    const { getCollectionDetails } = useMarketStore();
     const topCollections = ref([]);
 
     onMounted(async () => {
       try {
-        const res = await getTopCollection();
-        if (res) {
-          for (let i = 0; i < res.length; i++) {
-            let collectionItem = await getCollectionDetails(res[i][0]);
-            collectionItem.link = `/collection/${res[i][0]}`;
+        const res = await axios.get("/api/collection/topCollection");
+
+        if (res.status === 200) {
+          for (let i = 0; i < res.data.length; i++) {
+            let collectionItem = await getCollectionDetails(res.data[i][0]);
+            collectionItem.link = `/collection/${res.data[i][0]}`;
             topCollections.value.push(collectionItem);
           }
         }
       } catch (err) {
-        console.log(err);
+        if (err.response.status === 404)
+          // TODO if no top collection, show something else
+          console.log(err);
       }
     });
 

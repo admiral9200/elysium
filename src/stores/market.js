@@ -95,20 +95,6 @@ export const useMarketStore = defineStore("user", () => {
     }
   };
 
-  const getTopCollection = async () => {
-    try {
-      const res = await axios.get("/api/collection/topCollection");
-      if (res.status === 200) {
-        return res.data;
-      }
-    } catch (err) {
-      if (err.response.status === 404) {
-        return [];
-      }
-      console.log(err);
-    }
-  };
-
   const unlinkCollection = async (user_address, tokenIndex) => {
     let newCollections = await getLinkedCollection(user_address);
     newCollections.splice(tokenIndex, 1);
