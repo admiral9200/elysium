@@ -3,7 +3,7 @@
   <v-row class="mt-5" v-if="topCollections.length">
     <v-col cols="12" md="4" v-for="item in topCollections" :key="item.address">
       <v-card class="mx-auto" max-width="344" color="black">
-        <v-img src="https://picsum.photos/600/300" height="200px"></v-img>
+        <v-img :src="item.cover" height="200px"></v-img>
         <v-card-title class="text-h5">{{ item.name }}</v-card-title>
         <v-card-text>{{ item.address }}</v-card-text>
         <v-card-actions class="d-flex justify-space-between mx-2">
@@ -33,6 +33,7 @@ export default {
         if (res.status === 200) {
           for (const item of res.data) {
             let collectionItem = await getCollectionDetails(item[0]);
+            if (collectionItem == null) continue;
             collectionItem.link = `/collection/${item[0]}`;
             collectionItem.counts = item[1];
             topCollections.value.push(collectionItem);

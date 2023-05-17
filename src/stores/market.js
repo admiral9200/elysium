@@ -214,10 +214,14 @@ export const useMarketStore = defineStore("user", () => {
           nftContractABI.abi,
           provider
         );
-        //TODO check if collection exists
+        const totalSupply = await nftContract.totalSupply();
+        if (totalSupply == 0) return null;
+        const cover = await getCollectionCover(collectionAddress);
         const royaltyFee = await nftContract.getRoyalty();
         const collection = {
           address: collectionAddress,
+          cover: cover,
+          owner: await nftContract.owner(),
           name: await nftContract.name(),
           symbol: await nftContract.symbol(),
           royalty: BigInt(royaltyFee).toString(),
@@ -225,6 +229,28 @@ export const useMarketStore = defineStore("user", () => {
         };
         console.log("collection", collection);
         return collection;
+      } else {
+        console.log("Ethereum object doesn't exist!");
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const getCollectionCover = async (tokenAddress) => {
+    try {
+      if (window.ethereum) {
+        const provider = new ethers.BrowserProvider(window.ethereum);
+        const nftContract = new ethers.Contract(
+          tokenAddress,
+          nftContractABI.abi,
+          provider
+        );
+        const tokenId = await nftContract.tokenByIndex(0);
+        const tokenHash = await nftContract.tokenURI(tokenId);
+        const meta = await getTokenMeta(tokenHash);
+        const imgHash = meta.image;
+        return "https://ipfs.io/ipfs/" + imgHash;
       } else {
         console.log("Ethereum object doesn't exist!");
       }
