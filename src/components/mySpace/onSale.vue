@@ -111,7 +111,7 @@
         </v-card>
       </v-col>
     </v-row>
-    <v-row v-else>
+    <v-row v-else-if="!loading">
       <v-col cols="12" class="text-center">
         <!-- <v-img src="@/assets/images/empty.svg" width="200"></v-img> -->
         <h3 class="mt-4">You don't have any NFTs yet</h3>
@@ -120,6 +120,30 @@
         </p>
         <v-btn color="accent" variant="text" class="mt-4"> Buy NFT </v-btn>
         <v-btn color="accent" variant="text" class="mt-4"> Create NFT </v-btn>
+      </v-col>
+    </v-row>
+    <v-row v-else>
+      <v-col cols="12" class="text-center">
+        <v-responsive class="mx-auto" height="200px">
+          <v-overlay
+            v-model="loading"
+            class="align-center justify-center"
+            contained
+            persistent
+          >
+            <v-progress-circular
+              color="primary"
+              indeterminate
+              size="60"
+              width="8"
+            ></v-progress-circular>
+            <h3 class="mt-3">Loading NFTs</h3>
+            <p class="mt-2">
+              Trying to fetch the NFTs from the blockchain. This may take a
+              while...
+            </p>
+          </v-overlay>
+        </v-responsive>
       </v-col>
     </v-row>
   </v-container>
@@ -154,6 +178,7 @@ export default {
     const menu = ref(false);
     const selectedView = ref("smallIcon");
     const showNFTDetail = ref(false);
+    const loading = ref(true);
 
     // computed
     const iconSize = computed(() =>
@@ -171,6 +196,7 @@ export default {
     onMounted(async () => {
       try {
         const res = await getUserListedNFTs(props.userAddress);
+        loading.value = false;
         if (res) {
           listedNFTs.value = res;
           console.log("On Sale", res);
@@ -185,6 +211,7 @@ export default {
       selectedView,
       listedNFTs,
       showNFTDetail,
+      loading,
       selectedNFT,
       // computed
       iconSize,

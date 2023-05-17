@@ -111,9 +111,33 @@
         </v-card>
       </v-col>
     </v-row>
-    <v-row v-else>
+    <v-row v-else-if="!loading">
       <v-col cols="12" class="text-center">
         <h3 class="mt-4">This collection doesn't have any NFTs for sale yet</h3>
+      </v-col>
+    </v-row>
+    <v-row v-else>
+      <v-col cols="12" class="text-center">
+        <v-responsive class="mx-auto" height="200px">
+          <v-overlay
+            v-model="loading"
+            class="align-center justify-center"
+            contained
+            persistent
+          >
+            <v-progress-circular
+              color="primary"
+              indeterminate
+              size="60"
+              width="8"
+            ></v-progress-circular>
+            <h3 class="mt-3">Loading NFTs</h3>
+            <p class="mt-2">
+              Trying to fetch the NFTs from the blockchain. This may take a
+              while...
+            </p>
+          </v-overlay>
+        </v-responsive>
       </v-col>
     </v-row>
   </v-container>
@@ -148,6 +172,7 @@ export default {
     const menu = ref(false);
     const selectedView = ref("smallIcon");
     const showNFTDetail = ref(false);
+    const loading = ref(true);
 
     // computed
     const iconSize = computed(() =>
@@ -165,6 +190,7 @@ export default {
     onMounted(async () => {
       try {
         const res = await getListedNFTs(props.collectionAddress);
+        loading.value = false;
         if (res) {
           listedNFTs.value = res;
           console.log("On Sale", res);
@@ -179,6 +205,7 @@ export default {
       selectedView,
       listedNFTs,
       showNFTDetail,
+      loading,
       selectedNFT,
       // computed
       iconSize,
