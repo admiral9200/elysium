@@ -7,7 +7,8 @@
         <v-card-title class="text-h5">{{ item.name }}</v-card-title>
         <v-card-text>{{ item.address }}</v-card-text>
         <v-card-actions class="d-flex justify-space-between mx-2">
-          <v-btn variant="outlined" :to="item.link">View</v-btn>
+          <v-btn variant="outlined">{{ item.counts }} Followers</v-btn>
+          <v-btn class="w-50" variant="outlined" :to="item.link">View</v-btn>
         </v-card-actions>
       </v-card>
     </v-col>
@@ -33,6 +34,7 @@ export default {
           for (const item of res.data) {
             let collectionItem = await getCollectionDetails(item[0]);
             collectionItem.link = `/collection/${item[0]}`;
+            collectionItem.counts = item[1];
             topCollections.value.push(collectionItem);
           }
         }
