@@ -1,18 +1,23 @@
 <template>
   <v-app-bar color="black">
-    <v-app-bar-title class="font-weight-black text-h5">
+    <v-app-bar-title class="font-weight-black text-h5" @click="home()">
       <v-icon icon="mdi-alpha-e-box" size="50" />
-      Elysium
+      <span class="d-none d-sm-inline-block ms-3">Elysium</span>
     </v-app-bar-title>
 
-    <v-text-field
-      append-icon="mdi-magnify"
-      label="Search"
-      single-line
-      hide-details
-    ></v-text-field>
-
-    <v-spacer></v-spacer>
+    <div class="d-none d-sm-flex w-50">
+      <v-text-field
+        append-icon="mdi-magnify"
+        label="Search"
+        density="compact"
+        single-line
+        hide-details
+      ></v-text-field>
+      <v-spacer></v-spacer>
+    </div>
+    <div class="d-flex d-sm-none w-10 justify-end">
+      <v-btn icon="mdi-magnify"></v-btn>
+    </div>
 
     <v-btn
       to="/"
@@ -135,6 +140,10 @@ export default {
       // }
     });
 
+    const home = () => {
+      router.push("/");
+    };
+
     const login = async () => {
       //connect wallet
       await marketStore.connectWallet();
@@ -168,6 +177,7 @@ export default {
       isConnected,
       pfp_url,
       //function
+      home,
       login,
       logout,
     };
