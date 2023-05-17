@@ -106,13 +106,16 @@
     </v-row>
     <v-row v-else-if="!loading">
       <v-col cols="12" class="text-center">
-        <!-- <v-img src="@/assets/images/empty.svg" width="200"></v-img> -->
-        <h3 class="mt-4">You don't have any NFTs yet</h3>
+        <h3 class="mt-4">There is no NFT here</h3>
         <p class="mt-2">
           You can buy NFTs from the marketplace or create your own NFTs
         </p>
-        <v-btn color="accent" variant="text" class="mt-4"> Buy NFT </v-btn>
-        <v-btn color="accent" variant="text" class="mt-4"> Create NFT </v-btn>
+        <v-btn color="accent" variant="text" class="mt-4" to="/">
+          Buy NFT
+        </v-btn>
+        <v-btn color="accent" variant="text" class="mt-4" to="/create-nft">
+          Create NFT
+        </v-btn>
       </v-col>
     </v-row>
     <v-row v-else>
