@@ -56,7 +56,7 @@ export default {
     const { createNFTCollection } = useMarketStore();
     // data
     const valid = ref(false);
-    const wallet = ref("0x2e8cf6a2a42C7F9c95136845fEf36798efA487d3");
+    const wallet = sessionStorage.getItem("address");
     const name = ref("");
     const symbol = ref("");
     const loyalty = ref("");
@@ -68,7 +68,7 @@ export default {
           name.value,
           symbol.value,
           loyalty.value,
-          wallet.value
+          wallet
         );
         console.log(created);
       } catch (err) {
