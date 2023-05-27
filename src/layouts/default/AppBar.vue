@@ -49,11 +49,14 @@
     </v-btn>
     <v-menu v-else>
       <template v-slot:activator="{ props }">
-        <v-btn v-bind="props"
-          ><img
-            style="width: 35px; border: 2px solid #fff; border-radius: 100%"
-            :src="pfp_url"
-          />
+        <v-btn v-bind="props">
+          <v-avatar size="35">
+            <v-img
+              style="border: 2px solid #fff; border-radius: 100%"
+              :src="pfp_url"
+              alt="Profile Picture"
+            />
+          </v-avatar>
         </v-btn>
       </template>
 
