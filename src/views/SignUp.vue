@@ -97,7 +97,7 @@ export default {
     });
 
     const submit = async () => {
-      if (valid) {
+      if (valid.value === true) {
         const data = {
           username: username.value,
           address: store.account,
@@ -111,6 +111,8 @@ export default {
           console.log(res.data);
           emit("onSignUp", false);
         }
+      } else {
+        console.log(valid.value);
       }
     };
 
