@@ -25,8 +25,8 @@
           required
         ></v-text-field>
         <v-text-field
-          v-model="loyalty"
-          label="Loyalty"
+          v-model="royalty"
+          label="Royalty"
           variant="outlined"
           density="compact"
           suffix="%"
@@ -59,7 +59,7 @@ export default {
     const wallet = sessionStorage.getItem("address");
     const name = ref("");
     const symbol = ref("");
-    const loyalty = ref("");
+    const royalty = ref("");
 
     const submit = async () => {
       // if (valid) {
@@ -67,7 +67,7 @@ export default {
         const created = await createNFTCollection(
           name.value,
           symbol.value,
-          loyalty.value,
+          royalty.value,
           wallet
         );
         console.log(created);
@@ -82,7 +82,7 @@ export default {
       wallet,
       name,
       symbol,
-      loyalty,
+      royalty,
       submit,
     };
   },
