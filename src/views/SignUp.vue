@@ -8,7 +8,9 @@
       <v-container class="overflow-y-auto" style="height: 72vh" fluid>
         <v-card-text>
           <v-text-field
+            class="mb-2"
             v-model="username"
+            :rules="[rules.required, rules.username, rules.maxUsername]"
             label="Username"
             placeholder="john_doe"
             prefix="@"
@@ -16,17 +18,22 @@
             required
           ></v-text-field>
           <v-textarea
+            class="my-4"
             v-model="desc"
-            label="Bio"
+            :rules="[rules.maxBio]"
+            label="Bio (Optional)"
             placeholder="Too awesome for bio..."
             rows="3"
             variant="outlined"
           ></v-textarea>
           <v-text-field
+            class="mt-2"
             v-model="email"
+            :rules="[rules.required, rules.email]"
             label="Email"
             placeholder="eg. example@email.com"
             variant="outlined"
+            required
           ></v-text-field>
         </v-card-text>
       </v-container>
@@ -66,19 +73,44 @@ export default {
     const desc = ref("");
     const email = ref("");
 
+    const rules = {
+      required: (v) => !!v || "This field is required.",
+      username: (v) => {
+        const pattern = /^[a-zA-Z0-9_]+$/;
+        return pattern.test(username.value) || "Invalid username.";
+      },
+      maxUsername: (v) => v.length <= 25 || "Max 25 characters.",
+      maxBio: (v) => v.length <= 150 || "Max 150 characters.",
+      email: () => {
+        const pattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        return pattern.test(email.value) || "Please enter a valid email.";
+      },
+    };
+
+    const valid = computed(() => {
+      return (
+        username.value.length > 0 &&
+        email.value.length > 0 &&
+        rules.username(username.value) &&
+        rules.email(email.value)
+      );
+    });
+
     const submit = async () => {
-      const data = {
-        username: username.value,
-        address: store.account,
-        email: email.value,
-        profile_url: "https://source.boringavatars.com/pixel/250",
-        background_url: "https://source.boringavatars.com/pixel/250",
-        description: desc.value,
-      };
-      const res = await axios.post("/api/user", data);
-      if (res.status === 200) {
-        console.log(res.data);
-        emit("onSignUp", false);
+      if (valid) {
+        const data = {
+          username: username.value,
+          address: store.account,
+          email: email.value,
+          profile_url: "https://source.boringavatars.com/pixel/250",
+          background_url: "https://source.boringavatars.com/pixel/250",
+          description: desc.value,
+        };
+        const res = await axios.post("/api/user", data);
+        if (res.status === 200) {
+          console.log(res.data);
+          emit("onSignUp", false);
+        }
       }
     };
 
@@ -86,6 +118,7 @@ export default {
       username,
       desc,
       email,
+      rules,
       submit,
     };
   },
