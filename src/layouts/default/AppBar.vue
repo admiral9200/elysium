@@ -153,18 +153,18 @@ export default {
       //check if user previously signed up
       try {
         const res = await axios.get("/api/user/" + account.value);
-        //if not, show sign up page
-        if (res.data === "User not found") {
+        sessionStorage.setItem("address", account.value);
+        sessionStorage.setItem("pfp", res.data.profile_url);
+        pfp_url.value = sessionStorage.getItem("pfp");
+        isConnected.value = true;
+      } catch (error) {
+        console.log(error.response.status);
+        //if user not found, show sign up page
+        if (error.response.status === 404) {
           emit("onSignUp", true);
         } else {
-          // else, save user info to session storage
-          sessionStorage.setItem("address", account.value);
-          sessionStorage.setItem("pfp", res.data.profile_url);
-          pfp_url.value = sessionStorage.getItem("pfp");
-          isConnected.value = true;
+          console.error(error);
         }
-      } catch (error) {
-        console.error(error);
       }
     };
 
