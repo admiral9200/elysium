@@ -4,7 +4,9 @@
     <v-form>
       <v-card-text>
         <v-text-field
+          class="mb-2"
           v-model="username"
+          :rules="[rules.required, rules.username, rules.maxUsername]"
           label="Username *"
           placeholder="john_doe"
           prefix="@"
@@ -12,8 +14,10 @@
           required
         ></v-text-field>
         <v-textarea
+          class="my-4"
           v-model="bio"
-          label="Bio"
+          :rules="[rules.maxBio]"
+          label="Bio (Optional)"
           placeholder="Insert catchy bio here ..."
           outlined
           rows="3"
@@ -29,7 +33,7 @@
   </v-card>
 </template>
 <script>
-import { ref } from "vue";
+import { ref, computed } from "vue";
 import axios from "axios";
 export default {
   name: "Edit Profile",
@@ -38,23 +42,41 @@ export default {
   setup(props) {
     const username = ref(props.user.username);
     const bio = ref(props.user.description);
+
+    const rules = {
+      required: (v) => !!v || "This field is required.",
+      username: (v) => {
+        const pattern = /^[a-zA-Z0-9_]+$/;
+        return pattern.test(username.value) || "Invalid username.";
+      },
+      maxUsername: (v) => v.length <= 25 || "Max 25 characters.",
+      maxBio: (v) => v.length <= 150 || "Max 150 characters.",
+    };
+
+    const valid = computed(() => {
+      return username.value.length > 0 && rules.username(username.value);
+    });
+
     const save = async () => {
-      try {
-        const res = await axios.put("/api/user", {
-          address: sessionStorage.getItem("address"),
-          username: username.value,
-          description: bio.value,
-        });
-        console.log(res);
-      } catch (err) {
-        console.log(err);
-        console.log(err.response.data.message);
+      if (valid.value === true) {
+        try {
+          const res = await axios.put("/api/user", {
+            address: sessionStorage.getItem("address"),
+            username: username.value,
+            description: bio.value,
+          });
+          console.log(res);
+        } catch (err) {
+          console.log(err);
+          console.log(err.response.data.message);
+        }
       }
     };
 
     return {
       username,
       bio,
+      rules,
       save,
     };
   },
