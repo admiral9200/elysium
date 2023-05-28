@@ -7,6 +7,7 @@
           <v-form @submit.prevent>
             <v-card-text>
               <v-text-field
+                class="mb-2"
                 v-model="wallet"
                 label="Wallet Address"
                 variant="outlined"
@@ -14,7 +15,9 @@
                 readonly
               ></v-text-field>
               <v-select
+                class="my-4"
                 v-model="selectedCollection"
+                :rules="[rules.required]"
                 :items="collections"
                 label="Collection"
                 variant="outlined"
@@ -23,7 +26,9 @@
               >
               </v-select>
               <v-file-input
+                class="my-4"
                 v-model="file"
+                :rules="[rules.required, rules.fileType]"
                 label="File"
                 show-size
                 variant="outlined"
@@ -31,14 +36,18 @@
                 required
               ></v-file-input>
               <v-text-field
+                class="my-4"
                 v-model="name"
+                :rules="[rules.required, rules.min, rules.maxName, rules.name]"
                 label="Name"
                 variant="outlined"
                 density="compact"
                 required
               ></v-text-field>
               <v-textarea
+                class="my-4"
                 v-model="description"
+                :rules="[rules.required, rules.min, rules.maxDescription]"
                 label="Description"
                 variant="outlined"
                 rows="3"
@@ -60,7 +69,9 @@
                 </div>
               </div>
               <v-text-field
+                class="my-4"
                 v-model="price"
+                :rules="[rules.required, rules.minPrice]"
                 label="Price"
                 variant="outlined"
                 density="compact"
@@ -134,7 +145,6 @@ export default {
       listNFT,
     } = useMarketStore();
     // data
-    const valid = ref(false);
     const wallet = sessionStorage.getItem("address");
     const collections = ref("");
     const collectionDetails = ref([]);
@@ -145,6 +155,43 @@ export default {
     const price = ref();
     const freeMint = ref("No");
     const file = ref("");
+
+    const rules = {
+      required: (value) => !!value || "This field is required.",
+      min: (v) => v.length >= 3 || "Min 3 characters",
+      maxName: (v) => v.length <= 25 || "Max 25 characters",
+      maxDescription: (v) => v.length <= 250 || "Max 250 characters",
+      name: (v) => {
+        const pattern = /^[^\s]+[a-zA-Z0-9_ ]+[^\s]$/;
+        return pattern.test(v) || "Invalid name.";
+      },
+      fileType: (v) => {
+        const pattern = /image/;
+        return pattern.test(v[0].type) || "Image only. (jpg, jpeg, png)";
+      },
+      minPrice: (v) => v >= 0.001 || "Min 0.001 ETH",
+    };
+
+    const valid = computed(() => {
+      if (onSale.value === "Yes") {
+        return (
+          name.value.length >= 3 &&
+          name.value.length <= 25 &&
+          description.value.length <= 250 &&
+          rules.name(name.value) &&
+          rules.fileType(file.value) &&
+          price.value >= 0.001
+        );
+      } else {
+        return (
+          name.value.length >= 3 &&
+          name.value.length <= 25 &&
+          description.value.length <= 250 &&
+          rules.name(name.value) &&
+          rules.fileType(file.value)
+        );
+      }
+    });
 
     const previewImg = computed(() => {
       if (file.value) {
@@ -164,40 +211,45 @@ export default {
     });
 
     const submit = async () => {
-      // if (valid.value) {
-      const fileData = await uploadFileToIPFS(file.value[0]);
-      console.log("fileData.IpfsHash", fileData.IpfsHash);
-      const json = {
-        name: name.value,
-        description: description.value,
-        image: fileData.IpfsHash,
-      };
-      const jsonFile = await uploadJSONToIPFS(json);
-      console.log("file", jsonFile.IpfsHash);
-      const tokenId = await mintNFT(
-        sessionStorage.getItem("address"),
-        selectedCollection.value,
-        jsonFile.IpfsHash
-      );
-      // const tokenId = await mintNFT(
-      //   sessionStorage.getItem("address"),
-      //   selectedCollection.value,
-      //   "QmRaWcj4SsKuYyaemp7upnjHxk44AtC13JBvzwGH3YbJzc"
-      // );
+      if (valid.value === true) {
+        console.log("submit");
+        const fileData = await uploadFileToIPFS(file.value[0]);
+        console.log("fileData.IpfsHash", fileData.IpfsHash);
+        const json = {
+          name: name.value,
+          description: description.value,
+          image: fileData.IpfsHash,
+        };
+        const jsonFile = await uploadJSONToIPFS(json);
+        console.log("file", jsonFile.IpfsHash);
+        const tokenId = await mintNFT(
+          sessionStorage.getItem("address"),
+          selectedCollection.value,
+          jsonFile.IpfsHash
+        );
+        // const tokenId = await mintNFT(
+        //   sessionStorage.getItem("address"),
+        //   selectedCollection.value,
+        //   "QmRaWcj4SsKuYyaemp7upnjHxk44AtC13JBvzwGH3YbJzc"
+        // );
 
-      console.log("mint", tokenId);
+        console.log("mint", tokenId);
 
-      if (onSale.value === "Yes") {
-        try {
-          const res = await listNFT(
-            collectionAddress[0],
-            tokenId,
-            price.value.toString()
-          );
-          console.log("listed on sale", res);
-        } catch (err) {
-          console.log(err);
+        if (onSale.value === "Yes") {
+          try {
+            const res = await listNFT(
+              collectionAddress[0],
+              tokenId,
+              price.value.toString()
+            );
+            console.log("listed on sale", res);
+          } catch (err) {
+            console.log(err);
+          }
         }
+        reset();
+      } else {
+        console.log("Invalid", valid.value);
       }
     };
 
@@ -211,6 +263,7 @@ export default {
     };
 
     onMounted(async () => {
+      //TODO: redirect to create collection if no collection
       const res = await getMyCollection();
       collections.value = res;
       selectedCollection.value = res[0];
@@ -222,7 +275,6 @@ export default {
     });
 
     return {
-      valid,
       wallet,
       collections,
       selectedCollection,
@@ -234,6 +286,7 @@ export default {
       freeMint,
       file,
       previewImg,
+      rules,
       submit,
       reset,
     };
