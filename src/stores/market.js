@@ -215,8 +215,10 @@ export const useMarketStore = defineStore("user", () => {
           provider
         );
         const totalSupply = await nftContract.totalSupply();
-        if (totalSupply == 0) return null;
-        const cover = await getCollectionCover(collectionAddress);
+        let cover = "";
+        if (totalSupply > 0) {
+          cover = await getCollectionCover(collectionAddress);
+        }
         const royaltyFee = await nftContract.getRoyalty();
         const collection = {
           address: collectionAddress,
@@ -226,6 +228,7 @@ export const useMarketStore = defineStore("user", () => {
           symbol: await nftContract.symbol(),
           royalty: BigInt(royaltyFee).toString(),
           royaltyRecipient: await nftContract.getRoyaltyRecipient(),
+          totalSupply: totalSupply.toString(),
         };
         console.log("collection", collection);
         return collection;
