@@ -238,7 +238,7 @@ export default {
         if (onSale.value === "Yes") {
           try {
             const res = await listNFT(
-              collectionAddress[0],
+              selectedCollection.value,
               tokenId,
               price.value.toString()
             );
