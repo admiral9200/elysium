@@ -162,7 +162,7 @@ export default {
       maxName: (v) => v.length <= 25 || "Max 25 characters",
       maxDescription: (v) => v.length <= 250 || "Max 250 characters",
       name: (v) => {
-        const pattern = /^[^\s]+[a-zA-Z0-9_ ]+[^\s]$/;
+        const pattern = /^[^\W]+[a-zA-Z0-9_ ]+[^\W]+$/;
         return pattern.test(v) || "Invalid name.";
       },
       fileType: (v) => {
