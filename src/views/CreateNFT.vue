@@ -1,5 +1,16 @@
 <template>
   <v-container>
+    <v-alert
+      v-if="alert.show"
+      class="my-3"
+      theme="dark"
+      :color="alert.color"
+      :icon="alert.icon"
+      :title="alert.title"
+      :text="alert.text"
+      variant="tonal"
+      density="compact"
+    ></v-alert>
     <v-row>
       <v-col md="8" cols="12">
         <v-card variant="outlined" theme="dark">
@@ -144,7 +155,7 @@ export default {
       mintNFT,
       listNFT,
     } = useMarketStore();
-    // data
+
     const wallet = sessionStorage.getItem("address");
     const collections = ref("");
     const collectionDetails = ref([]);
@@ -155,6 +166,14 @@ export default {
     const price = ref();
     const freeMint = ref("No");
     const file = ref("");
+
+    const alert = ref({
+      show: false,
+      color: "",
+      icon: "",
+      title: "",
+      text: "",
+    });
 
     const rules = {
       required: (value) => !!value || "This field is required.",
@@ -177,6 +196,7 @@ export default {
         return (
           name.value.length >= 3 &&
           name.value.length <= 25 &&
+          description.value.length >= 3 &&
           description.value.length <= 250 &&
           rules.name(name.value) &&
           rules.fileType(file.value) &&
@@ -186,6 +206,7 @@ export default {
         return (
           name.value.length >= 3 &&
           name.value.length <= 25 &&
+          description.value.length >= 3 &&
           description.value.length <= 250 &&
           rules.name(name.value) &&
           rules.fileType(file.value)
@@ -247,8 +268,22 @@ export default {
             console.log(err);
           }
         }
-        reset();
+        alert.value = {
+          show: true,
+          color: "success",
+          icon: "$success",
+          title: "Success",
+          text: "NFT Minted Successfully",
+        };
+        // reset();
       } else {
+        alert.value = {
+          show: true,
+          color: "error",
+          icon: "$error",
+          title: "Oops...",
+          text: "Please check your input and try again",
+        };
         console.log("Invalid", valid.value);
       }
     };
@@ -285,6 +320,7 @@ export default {
       price,
       freeMint,
       file,
+      alert,
       previewImg,
       rules,
       submit,
