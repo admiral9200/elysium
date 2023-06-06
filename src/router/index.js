@@ -42,6 +42,34 @@ const routes = [
       },
     ],
   },
+  {
+    path: "/admin",
+    component: () => import("@/layouts/admin/View.vue"),
+    children: [
+      {
+        path: "",
+        redirect: "admin/dashboard",
+      },
+      {
+        path: "dashboard",
+        name: "Dashboard",
+        component: () =>
+          import(/* webpackChunkName: "Index" */ "@/views/Admin/Index.vue"),
+      },
+      {
+        path: "user",
+        name: "User",
+        component: () =>
+          import(/* webpackChunkName: "User" */ "@/views/Admin/User.vue"),
+      },
+      {
+        path: "collection",
+        name: "Collection",
+        component: () =>
+          import(/* webpackChunkName: "User" */ "@/views/Admin/Collection.vue"),
+      },
+    ],
+  },
 ];
 
 const router = createRouter({
