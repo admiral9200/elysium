@@ -28,11 +28,11 @@
             >
               <v-row v-bind="props">
                 <v-col cols="4">
-                  <v-img :src="item.tokenUri" aspect-ratio="1.5" />
+                  <v-img :src="item.tokenUri" aspect-ratio="1.5" height="85" />
                 </v-col>
                 <v-col cols="5">
                   <h3>{{ item.tokenName }}</h3>
-                  <!-- <p>{{ item.collection }}</p> -->
+                  <p>{{ item.collectionName }}</p>
                 </v-col>
                 <v-col cols="3" class="d-flex align-center">
                   <v-slide-x-reverse-transition leave-absolute>
@@ -55,7 +55,6 @@
         </div>
       </div>
       <div v-else class="text-center">
-        <!-- <v-img src="@/assets/images/empty.svg" width="200"></v-img> -->
         <h3 class="mt-4">You haven't added any NFTs to cart yet</h3>
         <p class="mt-2">You can buy NFTs from the marketplace</p>
         <v-btn color="accent" variant="text" class="mt-4"> Buy NFT </v-btn>

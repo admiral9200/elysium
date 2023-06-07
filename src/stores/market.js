@@ -532,6 +532,7 @@ export const useMarketStore = defineStore("user", () => {
           const meta = await getTokenMeta(tokenHash);
           const imgHash = meta.image;
           let nft = {
+            collectionName: await nftContract.name(),
             seller: marketItem.seller,
             tokenId: cartContent.tokenId,
             price: ethers.formatUnits(marketItem.price.toString(), "ether"),
