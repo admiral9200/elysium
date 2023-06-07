@@ -51,7 +51,7 @@ import OnSale from "@/components/collectionPage/onSale.vue";
 import Activity from "@/components/collectionPage/activity.vue";
 
 export default {
-  name: "MySpace",
+  name: "CollectionPage",
   components: {
     AllNFT,
     OnSale,

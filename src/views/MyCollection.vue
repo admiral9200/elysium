@@ -100,7 +100,7 @@ import { useRoute } from "vue-router";
 import createCollection from "@/components/myCollection/createCollection.vue";
 
 export default {
-  name: "CreateNFT",
+  name: "MyCollection",
   components: { createCollection },
   setup() {
     const {
