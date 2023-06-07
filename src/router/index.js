@@ -34,7 +34,7 @@ const routes = [
       },
       {
         path: "/collection/:address",
-        name: "Collection",
+        name: "CollectionPage",
         component: () =>
           import(
             /* webpackChunkName: "CollectionPage" */ "@/views/CollectionPage.vue"
