@@ -1,1 +1,2 @@
 /api/*  https://elysium-api.cyclic.app/api/:splat  200
+/*    /index.html   200
