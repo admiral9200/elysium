@@ -529,7 +529,6 @@ export const useMarketStore = defineStore("user", () => {
             item.tokenId
           );
           const tokenHash = await nftContract.tokenURI(item.tokenId);
-          console.log("Getting nft #" + i + " meta data...");
           const meta = await getTokenMeta(tokenHash);
           const imgHash = meta.image;
           let nft = {
