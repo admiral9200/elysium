@@ -63,12 +63,14 @@
     <v-divider></v-divider>
     <v-card-actions class="d-flex justify-space-between align-center">
       <h3>Total: {{ totalPrice }} ETH</h3>
-      <v-btn color="primary" large variant="outlined">Checkout</v-btn>
+      <v-btn color="primary" large variant="outlined" @click="checkout()">
+        Checkout
+      </v-btn>
     </v-card-actions>
   </v-card>
 </template>
 <script>
-import { ref, onMounted } from "vue";
+import { ref, onMounted, computed } from "vue";
 import axios from "axios";
 import { useMarketStore } from "@/stores/market";
 
@@ -78,8 +80,17 @@ export default {
   setup() {
     const cartItems = ref([]);
     const cartItemId = ref([]);
-    const { getCartNFTs } = useMarketStore();
-    const totalPrice = ref(0);
+    const { getCartNFTs, checkoutNFTs } = useMarketStore();
+
+    const totalPrice = computed(() => {
+      let price = 0;
+      if (cartItems.value.length > 0) {
+        for (const item of cartItems.value) {
+          price += parseFloat(item.price);
+        }
+      }
+      return price.toString();
+    });
 
     const removeCartItem = async (tokenIndex) => {
       console.log("removeCartItem", tokenIndex);
@@ -111,6 +122,16 @@ export default {
       }
     };
 
+    const checkout = async () => {
+      try {
+        const res = await checkoutNFTs(cartItems.value, totalPrice.value);
+        console.log(res);
+        // await clearCart();
+      } catch (err) {
+        console.log(err);
+      }
+    };
+
     onMounted(async () => {
       try {
         const res = await axios.post("/api/cart/check", {
@@ -135,6 +156,7 @@ export default {
       totalPrice,
       removeCartItem,
       clearCart,
+      checkout,
     };
   },
 };

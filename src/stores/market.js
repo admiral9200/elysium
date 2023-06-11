@@ -500,7 +500,7 @@ export const useMarketStore = defineStore("user", () => {
     if (allNfts.length > 0) {
       for (const nft of allNfts) {
         console.log("Searching for nfts listed by user...");
-        if (nft.seller.toLowerCase() === address) {
+        if (nft.seller.toLowerCase() === address.toLowerCase()) {
           nfts.push(nft);
         }
       }
@@ -532,9 +532,10 @@ export const useMarketStore = defineStore("user", () => {
           const meta = await getTokenMeta(tokenHash);
           const imgHash = meta.image;
           let nft = {
+            collectionAddress: item.collection,
             collectionName: await nftContract.name(),
             seller: marketItem.seller,
-            tokenId: cartContent.tokenId,
+            tokenId: item.tokenId,
             price: ethers.formatUnits(marketItem.price.toString(), "ether"),
             tokenUri: "https://ipfs.io/ipfs/" + imgHash,
             tokenName: meta.name,
@@ -552,7 +553,7 @@ export const useMarketStore = defineStore("user", () => {
       console.log(error);
     }
   };
-
+  //TODO remove tokenRoyalty
   const buyNFT = async (tokenAddress, tokenId, tokenRoyalty, tokenPrice) => {
     if (window.ethereum) {
       const provider = new ethers.BrowserProvider(window.ethereum);
@@ -564,15 +565,46 @@ export const useMarketStore = defineStore("user", () => {
       );
       const price = ethers.parseUnits(tokenPrice, "ether");
       try {
-        const tokenTxn = await marketContract.buyNFT(
-          tokenAddress,
-          tokenId,
-          price,
+        const tokenTxn = await marketContract.buyNFT(tokenAddress, tokenId, {
+          value: price,
+        });
+        console.log(tokenTxn);
+      } catch (err) {
+        console.log(err);
+      }
+    }
+  };
+
+  const checkoutNFTs = async (cartItems, totalPrice) => {
+    if (window.ethereum) {
+      const provider = new ethers.BrowserProvider(window.ethereum);
+      const signer = await provider.getSigner();
+      const marketContract = new ethers.Contract(
+        marketContractAddress,
+        marketContractABI.abi,
+        signer
+      );
+      const tokenAddresses = [];
+      const tokenIds = [];
+      const tokenPrices = [];
+
+      for (const item of cartItems) {
+        tokenAddresses.push(item.collectionAddress);
+        tokenIds.push(item.tokenId);
+        tokenPrices.push(ethers.parseUnits(item.price, "ether"));
+      }
+
+      const price = ethers.parseUnits(totalPrice, "ether");
+
+      try {
+        const tokenTxn = await marketContract.buyBulkNFTs(
+          tokenAddresses,
+          tokenIds,
           {
             value: price,
           }
         );
-        console.log(tokenTxn);
+        await tokenTxn.wait();
       } catch (err) {
         console.log(err);
       }
@@ -603,6 +635,7 @@ export const useMarketStore = defineStore("user", () => {
     getUserListedNFTs,
     getCartNFTs,
     buyNFT,
+    checkoutNFTs,
   };
 });
 
