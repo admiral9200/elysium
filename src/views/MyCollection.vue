@@ -96,7 +96,6 @@
 <script>
 import { ref, onMounted } from "vue";
 import { useMarketStore } from "@/stores/market";
-import { useRoute } from "vue-router";
 import createCollection from "@/components/myCollection/createCollection.vue";
 
 export default {
@@ -109,25 +108,25 @@ export default {
       unlinkCollection,
       getMyCollection,
     } = useMarketStore();
-    const route = useRoute();
     const showForm = ref(false);
     const linkedCollection = ref([]);
     const createdCollection = ref([]);
     const collectionAddress = ref("");
+    const ownerAddress = sessionStorage.getItem("address");
 
     const link = async (address) => {
-      await linkCollection(route.params.address, address);
-      linkedCollection.value = await getLinkedCollection(route.params.address);
+      await linkCollection(ownerAddress, address);
+      linkedCollection.value = await getLinkedCollection(ownerAddress);
     };
 
     const unlink = async (tokenIndex) => {
-      await unlinkCollection(route.params.address, tokenIndex);
-      linkedCollection.value = await getLinkedCollection(route.params.address);
+      await unlinkCollection(ownerAddress, tokenIndex);
+      linkedCollection.value = await getLinkedCollection(ownerAddress);
     };
 
     onMounted(async () => {
       try {
-        const res = await getLinkedCollection(route.params.address);
+        const res = await getLinkedCollection(ownerAddress);
         if (res != "404") {
           linkedCollection.value = res;
           console.log("linked", linkedCollection.value);
