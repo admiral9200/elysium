@@ -126,7 +126,7 @@ export default {
       try {
         const res = await checkoutNFTs(cartItems.value, totalPrice.value);
         console.log(res);
-        // await clearCart();
+        await clearCart();
       } catch (err) {
         console.log(err);
       }
