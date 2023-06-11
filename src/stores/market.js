@@ -553,8 +553,7 @@ export const useMarketStore = defineStore("user", () => {
       console.log(error);
     }
   };
-  //TODO remove tokenRoyalty
-  const buyNFT = async (tokenAddress, tokenId, tokenRoyalty, tokenPrice) => {
+  const buyNFT = async (tokenAddress, tokenId, tokenPrice) => {
     if (window.ethereum) {
       const provider = new ethers.BrowserProvider(window.ethereum);
       const signer = await provider.getSigner();

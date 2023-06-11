@@ -56,7 +56,7 @@
         color="primary"
         variant="outlined"
         v-if="!isSeller && nft.price"
-        @click="buy(nft.collection, nft.tokenId, nft.royalty, nft.price)"
+        @click="buy(nft.collection, nft.tokenId, nft.price)"
       >
         Buy
       </v-btn>
@@ -126,9 +126,9 @@ export default {
       }
     };
 
-    const buy = async (nftCollection, nftId, nftRoyalty, nftPrice) => {
+    const buy = async (nftCollection, nftId, nftPrice) => {
       try {
-        const res = await buyNFT(nftCollection, nftId, nftRoyalty, nftPrice);
+        const res = await buyNFT(nftCollection, nftId, nftPrice);
         console.log(res);
         await linkCollection(sessionStorage.getItem("address"), nftCollection);
       } catch (err) {
