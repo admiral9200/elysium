@@ -44,8 +44,9 @@ Step 3: Rename the .env.example file to .env and fill in the required informatio
 ```bash
 # .env.example
 #the smart contract are deployed to Sepolia testnet
-VITE_MARKET_CONTRACT_ADDRESS="0xffD0Cb3C6df61284756beC02F7C74a2012149a6f"
-VITE_FACTORY_CONTRACT_ADDRESS="0xf7730c30525deA223cE5F50633B54B9D376b1F7f"
+VITE_MARKET_CONTRACT_ADDRESS="0x583a9Bd3E45501e034235A12D10B7935A8Cd129E"
+VITE_FACTORY_CONTRACT_ADDRESS="0x716F7A753dc50310Fb25AeADaA7f699A708C7Db0"
+# setup a pinata account using https://pinata.cloud/
 VITE_PINATA_API_KEY="<your pinata api key>"
 VITE_PINATA_API_SECRET="<your pinata api secret>"
 # setup the back end using https://github.com/davidbong-05/elysium-mongodb-api.git
