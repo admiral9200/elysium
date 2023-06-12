@@ -22,7 +22,7 @@
 </template>
 
 <script>
-import { ref, computed } from "vue";
+import { ref, onMounted } from "vue";
 
 import AdminAppBar from "./AppBar.vue";
 import AdminSideBar from "./SideBar.vue";
@@ -39,7 +39,9 @@ export default {
   },
   setup() {
     const showSignUp = ref(false);
-
+    onMounted(() => {
+      document.title = "Elysium | Admin";
+    });
     return {
       showSignUp,
     };
