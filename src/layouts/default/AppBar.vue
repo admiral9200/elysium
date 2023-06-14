@@ -69,9 +69,9 @@
         >
           <v-list-item-title>{{ item.text }}</v-list-item-title>
         </v-list-item>
-        <v-list-item color="red" prepend-icon="mdi-logout" @click="logout()"
-          >Logout</v-list-item
-        >
+        <v-list-item color="red" prepend-icon="mdi-logout" @click="logout()">
+          <v-list-item-title>Logout</v-list-item-title>
+        </v-list-item>
       </v-list>
     </v-menu>
   </v-app-bar>
@@ -95,7 +95,7 @@ export default {
       {
         text: "My Space",
         icon: "mdi-space-invaders",
-        link: "/user/" + sessionStorage.getItem("address"),
+        link: ref("/user/" + sessionStorage.getItem("address")),
       },
       {
         text: "My Collection",
@@ -155,10 +155,11 @@ export default {
         const res = await axios.get("/api/user/" + account.value);
         sessionStorage.setItem("address", account.value);
         sessionStorage.setItem("pfp", res.data.profile_url);
+        menu[0].link.value = "/user/" + account.value;
         pfp_url.value = sessionStorage.getItem("pfp");
         isConnected.value = true;
       } catch (error) {
-        console.log(error.response.status);
+        console.log(error);
         //if user not found, show sign up page
         if (error.response.status === 404) {
           emit("onSignUp", true);
