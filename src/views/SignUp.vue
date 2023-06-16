@@ -90,7 +90,7 @@ import { useMarketStore } from "@/stores/market";
 
 export default {
   name: "SignUp",
-  emits: ["onSignUp", "signUpSuccess"],
+  emits: ["onSignUp"],
   setup(props, { emit }) {
     const store = useMarketStore();
     const username = ref("");
