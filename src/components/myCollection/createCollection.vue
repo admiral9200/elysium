@@ -94,7 +94,7 @@ import { useMarketStore } from "@/stores/market";
 export default {
   name: "createCollection",
   emits: ["onShowForm"],
-  setup(props, { emit }) {
+  setup() {
     const { createNFTCollection } = useMarketStore();
     // data
     const wallet = sessionStorage.getItem("address");
