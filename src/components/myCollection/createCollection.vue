@@ -90,14 +90,14 @@ export default {
         name.value.length > 0 &&
         symbol.value.length > 0 &&
         royalty.value.length > 0 &&
-        rules.min(name.value) &&
-        rules.min(symbol.value) &&
-        rules.name(name.value) &&
-        rules.symbol(symbol.value) &&
-        rules.maxName(name.value) &&
-        rules.maxSymbol(symbol.value) &&
-        rules.maxRoyalty(royalty.value) &&
-        rules.minRoyalty(royalty.value)
+        rules.min(name.value) === true &&
+        rules.min(symbol.value) === true &&
+        rules.name(name.value) === true &&
+        rules.symbol(symbol.value) === true &&
+        rules.maxName(name.value) === true &&
+        rules.maxSymbol(symbol.value) === true &&
+        rules.maxRoyalty(royalty.value) === true &&
+        rules.minRoyalty(royalty.value) === true
       );
     });
 
