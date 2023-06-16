@@ -302,9 +302,9 @@ export const useMarketStore = defineStore("user", () => {
             nftContractABI.abi,
             provider
           );
-
           const balance = await nftContract.balanceOf(address);
           console.log("Total NFTs owned:", balance.toString());
+          const royaltyFee = await nftContract.getRoyalty();
           for (let i = 0; i < balance; i++) {
             const tokenId = await nftContract.tokenOfOwnerByIndex(address, i);
             const owner = await nftContract.ownerOf(tokenId);
@@ -319,7 +319,7 @@ export const useMarketStore = defineStore("user", () => {
               tokenUri: "https://ipfs.io/ipfs/" + imgHash,
               tokenName: meta.name,
               tokenDescription: meta.description,
-              tokenRoyalty: meta.royalty,
+              royalty: royaltyFee.toString(),
             };
             nfts.push(nft);
           }
@@ -347,6 +347,7 @@ export const useMarketStore = defineStore("user", () => {
         );
         const totalSupply = await nftContract.totalSupply();
         console.log("Total NFTs in collection:", totalSupply.toString());
+        const royaltyFee = await nftContract.getRoyalty();
         for (let i = 0; i < totalSupply; i++) {
           const tokenId = await nftContract.tokenByIndex(i);
           const owner = await nftContract.ownerOf(tokenId);
@@ -361,7 +362,7 @@ export const useMarketStore = defineStore("user", () => {
             tokenUri: "https://ipfs.io/ipfs/" + imgHash,
             tokenName: meta.name,
             tokenDescription: meta.description,
-            tokenRoyalty: meta.royalty,
+            royalty: royaltyFee.toString(),
           };
           nfts.push(nft);
         }
@@ -452,6 +453,7 @@ export const useMarketStore = defineStore("user", () => {
         const nfts = [];
         const balance = await nftContract.balanceOf(marketContractAddress);
         console.log("Total NFTs listed:", balance.toString());
+        const royaltyFee = await nftContract.getRoyalty();
         for (let i = 0; i < balance; i++) {
           const tokenId = await nftContract.tokenOfOwnerByIndex(
             marketContractAddress,
@@ -473,6 +475,7 @@ export const useMarketStore = defineStore("user", () => {
             tokenName: meta.name,
             tokenDescription: meta.description,
             collection: collectionAddress,
+            royalty: royaltyFee.toString(),
           };
           nfts.push(nft);
         }
