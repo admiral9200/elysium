@@ -1,7 +1,28 @@
 <template>
   <v-card class="pa-md-2" width="450px" theme="dark">
-    <v-card-title class="text-white"> Create New Collection</v-card-title>
-    <v-form @submit.prevent>
+    <v-card-title class="text-white d-flex justify-space-between align-center">
+      Create New Collection
+      <v-btn
+        class="my-0"
+        icon="mdi-close"
+        size="small"
+        variant="plain"
+        @click="$emit('onShowForm', false)"
+      >
+      </v-btn>
+    </v-card-title>
+    <v-alert
+      v-if="alert.show"
+      class="my-3 mx-6"
+      theme="dark"
+      :color="alert.color"
+      :icon="alert.icon"
+      :title="alert.title"
+      :text="alert.text"
+      variant="tonal"
+      density="compact"
+    ></v-alert>
+    <v-form @submit.prevent v-if="alert.title != 'Success'">
       <v-card-text>
         <v-text-field
           class="mb-2"
@@ -50,6 +71,19 @@
         <v-btn color="primary" variant="tonal" @click="submit"> Create </v-btn>
       </v-card-actions>
     </v-form>
+    <v-card-actions
+      class="d-flex justify-center align-center"
+      v-if="alert.title == 'Success'"
+    >
+      <v-btn
+        color="primary"
+        large
+        variant="outlined"
+        @click="$emit('onShowForm', false)"
+      >
+        Close
+      </v-btn>
+    </v-card-actions>
   </v-card>
 </template>
 
@@ -59,14 +93,22 @@ import { useMarketStore } from "@/stores/market";
 
 export default {
   name: "createCollection",
-  components: {},
-  setup() {
+  emits: ["onShowForm"],
+  setup(props, { emit }) {
     const { createNFTCollection } = useMarketStore();
     // data
     const wallet = sessionStorage.getItem("address");
     const name = ref("");
     const symbol = ref("");
     const royalty = ref("");
+
+    const alert = ref({
+      show: false,
+      color: "",
+      icon: "",
+      title: "",
+      text: "",
+    });
 
     const rules = {
       required: (v) => !!v || "This field is required.",
@@ -116,11 +158,32 @@ export default {
             royalty.value,
             wallet
           );
+          alert.value = {
+            show: true,
+            color: "success",
+            icon: "$success",
+            title: "Success",
+            text: "Sign Up Successfully! Press the Connect button again to login",
+          };
           console.log(created);
         } catch (err) {
+          alert.value = {
+            show: true,
+            color: "error",
+            icon: "$error",
+            title: "Oops...",
+            text: "We are facing some issues please try again later...",
+          };
           console.log(err);
         }
       } else {
+        alert.value = {
+          show: true,
+          color: "error",
+          icon: "$error",
+          title: "Oops...",
+          text: "Please check your input and try again",
+        };
         console.log("Invalid", valid.value);
       }
     };
@@ -130,6 +193,7 @@ export default {
       name,
       symbol,
       royalty,
+      alert,
       rules,
       reset,
       submit,
