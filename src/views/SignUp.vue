@@ -1,11 +1,22 @@
 <template>
-  <v-card class="mt-md-2 me-md-2 pa-md-2" width="450px" theme="dark">
+  <v-card class="mt-md-8 me-md-2 pa-md-2" width="450px" theme="dark">
     <v-card-title class="d-flex justify-space-between align-center">
       <h2>Sign Up Now</h2>
     </v-card-title>
     <v-divider></v-divider>
-    <v-form @submit.prevent>
-      <v-container class="overflow-y-auto" style="height: 72vh" fluid>
+    <v-alert
+      v-if="alert.show"
+      class="mt-4 mx-6"
+      theme="dark"
+      :color="alert.color"
+      :icon="alert.icon"
+      :title="alert.title"
+      :text="alert.text"
+      variant="tonal"
+      density="compact"
+    ></v-alert>
+    <v-form @submit.prevent v-if="alert.title != 'Success'">
+      <v-container class="overflow-y-auto" style="height: 50vh" fluid>
         <v-card-text>
           <v-text-field
             class="mb-2"
@@ -38,25 +49,38 @@
         </v-card-text>
       </v-container>
       <v-divider></v-divider>
-
       <v-card-actions class="d-flex justify-center align-center">
         <v-btn
           color="secondary"
           large
           variant="outlined"
           @click="$emit('onSignUp', false)"
-          >Skip</v-btn
         >
+          Cancel
+        </v-btn>
         <v-btn
           color="primary"
           large
           variant="outlined"
           type="submit"
           @click="submit"
-          >Confirm</v-btn
         >
+          Confirm
+        </v-btn>
       </v-card-actions>
     </v-form>
+    <v-card-actions
+      class="d-flex justify-center align-center"
+      v-if="alert.title == 'Success'"
+    >
+      <v-btn
+        color="primary"
+        large
+        variant="outlined"
+        @click="$emit('onSignUp', false)"
+        >Close</v-btn
+      >
+    </v-card-actions>
   </v-card>
 </template>
 <script>
@@ -66,12 +90,20 @@ import { useMarketStore } from "@/stores/market";
 
 export default {
   name: "SignUp",
-  emits: ["onSignUp"],
+  emits: ["onSignUp", "signUpSuccess"],
   setup(props, { emit }) {
     const store = useMarketStore();
     const username = ref("");
     const desc = ref("");
     const email = ref("");
+
+    const alert = ref({
+      show: false,
+      color: "",
+      icon: "",
+      title: "",
+      text: "",
+    });
 
     const rules = {
       required: (v) => !!v || "This field is required.",
@@ -109,10 +141,23 @@ export default {
         const res = await axios.post("/api/user", data);
         if (res.status === 200) {
           console.log(res.data);
-          emit("onSignUp", false);
+          alert.value = {
+            show: true,
+            color: "success",
+            icon: "$success",
+            title: "Success",
+            text: "Sign Up Successfully! Press the Connect button again to login",
+          };
         }
       } else {
-        console.log(valid.value);
+        alert.value = {
+          show: true,
+          color: "error",
+          icon: "$error",
+          title: "Oops...",
+          text: "Please check your input and try again",
+        };
+        console.log("Invalid", valid.value);
       }
     };
 
@@ -120,6 +165,7 @@ export default {
       username,
       desc,
       email,
+      alert,
       rules,
       submit,
     };
