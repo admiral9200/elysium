@@ -4,6 +4,10 @@ The project is a NFT marketplace that is built on the Ethereum blockchain. It is
 
 ## Project Description
 
+User Guide:
+
+- [User Guide](https://elysium-user-guide.vercel.app/)
+
 Front End:
 
 - [elysium](https://github.com/davidbong-05/elysium.git)
