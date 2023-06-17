@@ -163,7 +163,7 @@ export default {
             color: "success",
             icon: "$success",
             title: "Success",
-            text: "Sign Up Successfully! Press the Connect button again to login",
+            text: "NFT created successfully!",
           };
           console.log(created);
         } catch (err) {
