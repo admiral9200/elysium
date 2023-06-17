@@ -123,8 +123,8 @@ export default {
       return (
         username.value.length > 0 &&
         email.value.length > 0 &&
-        rules.username(username.value) &&
-        rules.email(email.value)
+        rules.username(username.value) === true &&
+        rules.email(email.value) === true
       );
     });
 
