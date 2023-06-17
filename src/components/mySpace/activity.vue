@@ -60,7 +60,8 @@
     <v-row v-else>
       <v-col cols="12" class="text-center">
         <!-- <v-img src="@/assets/images/empty.svg" width="200"></v-img> -->
-        <h3 class="mt-4">No activity yet...</h3>
+        <!-- <h3 class="mt-4">No activity yet...</h3> -->
+        <h3 class="mt-4">Feature not yet available...</h3>
       </v-col>
     </v-row>
   </v-container>
