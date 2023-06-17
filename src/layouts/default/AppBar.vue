@@ -69,6 +69,13 @@
         >
           <v-list-item-title>{{ item.text }}</v-list-item-title>
         </v-list-item>
+        <v-list-item
+          prepend-icon="mdi-help"
+          href="https://elysium-user-guide.vercel.app/"
+          target="_blank"
+        >
+          <v-list-item-title>Help</v-list-item-title>
+        </v-list-item>
         <v-list-item color="red" prepend-icon="mdi-logout" @click="logout()">
           <v-list-item-title>Logout</v-list-item-title>
         </v-list-item>
@@ -107,24 +114,16 @@ export default {
         icon: "mdi-pencil-ruler",
         link: "/create-nft",
       },
-      {
-        text: "Manage Wallet",
-        icon: "mdi-wallet",
-        // link: "/wallet",
-        link: "/",
-      },
-      {
-        text: "Setting",
-        icon: "mdi-cog",
-        // link: "/setting",
-        link: "/",
-      },
-      {
-        text: "Help",
-        icon: "mdi-help",
-        // link: "/help",
-        link: "/",
-      },
+      // {
+      //   text: "Manage Wallet",
+      //   icon: "mdi-wallet",
+      //   // link: "/wallet",
+      // },
+      // {
+      //   text: "Setting",
+      //   icon: "mdi-cog",
+      //   // link: "/setting",
+      // },
     ];
 
     const pfp_url = ref("");
