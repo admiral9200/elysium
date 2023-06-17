@@ -3,7 +3,7 @@
     <Landing />
     <TopCollection />
     <TopUser />
-    <Trending />
+    <!-- <Trending /> -->
   </v-container>
 </template>
 
@@ -11,5 +11,5 @@
 import Landing from "@/components/home/Landing.vue";
 import TopCollection from "@/components/home/TopCollection.vue";
 import TopUser from "@/components/home/TopUser.vue";
-import Trending from "@/components/home/Trending.vue";
+// import Trending from "@/components/home/Trending.vue";
 </script>
