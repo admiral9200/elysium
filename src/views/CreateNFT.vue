@@ -93,7 +93,7 @@
                 required
                 v-if="onSale === 'Yes'"
               ></v-text-field>
-              <div class="d-flex justify-space-between align-center">
+              <!-- <div class="d-flex justify-space-between align-center">
                 <div>
                   <v-label>Free Minting</v-label>
                 </div>
@@ -107,7 +107,7 @@
                     disabled
                   ></v-switch>
                 </div>
-              </div>
+              </div> -->
             </v-card-text>
           </v-form>
         </v-card>
@@ -123,7 +123,7 @@
           <v-card-text v-if="onSale === 'Yes'">
             Price: {{ price }} ETH
           </v-card-text>
-          <v-card-text> Free Minting: {{ freeMint }} </v-card-text>
+          <!-- <v-card-text> Free Minting: {{ freeMint }} </v-card-text> -->
         </v-card>
         <v-btn
           class="my-3 bg-primary text-white"
