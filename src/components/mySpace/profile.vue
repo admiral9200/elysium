@@ -75,7 +75,7 @@
         class="mx-2"
         width="80%"
         color="primary"
-        variant="outlined"
+        variant="flat"
         v-if="canEdit"
         @click="() => (showEditProfile = !showEditProfile)"
       >
