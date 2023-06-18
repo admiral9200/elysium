@@ -37,35 +37,32 @@ export const useMarketStore = defineStore("user", () => {
   };
 
   const linkCollection = async (user_address, address) => {
-    let exist = false;
     let newCollections = await getLinkedCollection(user_address);
     if (newCollections.length > 0) {
       if (newCollections.includes(address)) {
-        console.log("Already Linked");
-        exist = true;
+        return "Already Linked";
       } else {
         newCollections.push(address);
       }
     } else {
       newCollections = address;
     }
-    if (!exist) {
-      const data = {
-        user_address: user_address,
-        nft_collection: newCollections,
-      };
-      console.log(newCollections);
+    const data = {
+      user_address: user_address,
+      nft_collection: newCollections,
+    };
+    console.log(newCollections);
 
-      try {
-        const res = await axios.put("/api/collection/", data);
-        if (res.data === "404") {
-          const newCollection = await axios.post("/api/collection/", data);
-          console.log("new collection", newCollection);
-        }
-        console.log("update collection", res);
-      } catch (err) {
-        console.log(err);
+    try {
+      const res = await axios.put("/api/collection/", data);
+      if (res.data === "404") {
+        const newCollection = await axios.post("/api/collection/", data);
+        console.log("new collection", newCollection);
       }
+      return 200;
+    } catch (err) {
+      console.log(err);
+      return "Something went wrong...";
     }
   };
 
@@ -105,8 +102,10 @@ export const useMarketStore = defineStore("user", () => {
     try {
       const res = await axios.put("/api/collection/", data);
       console.log("res", res);
+      return 200;
     } catch (err) {
       console.log(err);
+      return "Something went wrong...";
     }
   };
 
