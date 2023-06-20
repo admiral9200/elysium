@@ -11,7 +11,9 @@
       ></v-btn>
     </v-card-title>
     <v-card-actions>
-      <p>{{ cartItems.length }} Item<a v-if="cartItems.length > 1">s</a></p>
+      <p v-if="cartItems.length > 0">
+        {{ cartItems.length }} Item<a v-if="cartItems.length > 1">s</a>
+      </p>
       <v-btn class="ms-auto" variant="text" color="red" @click="clearCart()">
         Clear All
       </v-btn>
@@ -79,7 +81,6 @@ export default {
   emits: ["onShowCart"],
   setup() {
     const cartItems = ref([]);
-    const cartItemId = ref([]);
     const { getCartNFTs, checkoutNFTs } = useMarketStore();
 
     const totalPrice = computed(() => {
@@ -93,14 +94,23 @@ export default {
     });
 
     const removeCartItem = async (tokenIndex) => {
-      console.log("removeCartItem", tokenIndex);
       cartItems.value.splice(tokenIndex, 1);
-      cartItemId.value.splice(tokenIndex, 1);
-      console.log("cartItems", cartItemId.value);
+      if (cartItems.value.length === 0) {
+        await clearCart();
+        return 0;
+      }
+      let newCartContents = [];
+      for (const item of cartItems.value) {
+        let cartContent = {
+          collection: item.collectionAddress,
+          tokenId: item.tokenId,
+        };
+        newCartContents.push(cartContent);
+      }
       try {
         const res = await axios.put("/api/cart", {
           user_address: sessionStorage.getItem("address"),
-          cart_content: cartItemId.value,
+          cart_content: newCartContents,
         });
         console.log(res);
       } catch (err) {
@@ -110,12 +120,12 @@ export default {
 
     const clearCart = async () => {
       try {
-        const res = await axios.put("/api/cart", {
-          user_address: sessionStorage.getItem("address"),
-          cart_content: [],
+        const res = await axios.delete("/api/cart", {
+          data: {
+            user_address: sessionStorage.getItem("address"),
+          },
         });
         cartItems.value = [];
-        cartItemId.value = [];
         console.log(res);
       } catch (err) {
         console.log(err);
