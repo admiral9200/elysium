@@ -93,7 +93,7 @@
             </thead>
             <tbody>
               <tr v-for="item in createdCollection" :key="item">
-                <td>{{ item.name }}Name</td>
+                <td>{{ item.name }}</td>
                 <td>{{ item.address }}</td>
                 <td>
                   <v-btn
