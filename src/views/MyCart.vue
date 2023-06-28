@@ -1,5 +1,16 @@
 <template>
   <v-card class="mt-md-2 me-md-2 pa-md-2" width="450px" theme="dark">
+    <v-alert
+      v-if="alert.show"
+      class="my-3 mx-6"
+      theme="dark"
+      :color="alert.color"
+      :icon="alert.icon"
+      :title="alert.title"
+      :text="alert.text"
+      variant="tonal"
+      density="compact"
+    ></v-alert>
     <v-card-title class="d-flex justify-space-between align-center">
       <h2>My Cart</h2>
       <v-btn
@@ -82,6 +93,13 @@ export default {
   setup() {
     const cartItems = ref([]);
     const { getCartNFTs, checkoutNFTs } = useMarketStore();
+    const alert = ref({
+      show: false,
+      color: "",
+      icon: "",
+      title: "",
+      text: "",
+    });
 
     const totalPrice = computed(() => {
       let price = 0;
@@ -92,6 +110,26 @@ export default {
       }
       return price.toString();
     });
+
+    const setAlert = (status, msg) => {
+      if (status === "error") {
+        alert.value = {
+          show: true,
+          color: "error",
+          icon: "$error",
+          title: "Oops...",
+          text: msg,
+        };
+      } else if (status === "success") {
+        alert.value = {
+          show: true,
+          color: "success",
+          icon: "$success",
+          title: "Success",
+          text: msg,
+        };
+      }
+    };
 
     const removeCartItem = async (tokenIndex) => {
       cartItems.value.splice(tokenIndex, 1);
@@ -108,36 +146,40 @@ export default {
         newCartContents.push(cartContent);
       }
       try {
-        const res = await axios.put("/api/cart", {
+        await axios.put("/api/cart", {
           user_address: sessionStorage.getItem("address"),
           cart_content: newCartContents,
         });
-        console.log(res);
+        setAlert("success", "Item removed from cart");
       } catch (err) {
+        setAlert("error", "Oops... Something went wrong");
         console.log(err);
       }
     };
 
     const clearCart = async () => {
       try {
-        const res = await axios.delete("/api/cart", {
+        await axios.delete("/api/cart", {
           data: {
             user_address: sessionStorage.getItem("address"),
           },
         });
         cartItems.value = [];
-        console.log(res);
+        setAlert("success", "Cart cleared");
       } catch (err) {
+        setAlert("error", "Oops... Something went wrong");
         console.log(err);
       }
     };
 
     const checkout = async () => {
       try {
-        const res = await checkoutNFTs(cartItems.value, totalPrice.value);
-        console.log(res);
+        await checkoutNFTs(cartItems.value, totalPrice.value);
         await clearCart();
+        cartItems.value = [];
+        setAlert("success", "Checkout successful");
       } catch (err) {
+        setAlert("error", "Oops... Something went wrong");
         console.log(err);
       }
     };
@@ -162,6 +204,7 @@ export default {
     });
 
     return {
+      alert,
       cartItems,
       totalPrice,
       removeCartItem,
