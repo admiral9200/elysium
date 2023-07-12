@@ -40,9 +40,13 @@
         >
           <v-list-item-title>{{ item.text }}</v-list-item-title>
         </v-list-item>
-        <v-list-item color="red" prepend-icon="mdi-logout" @click="logout()"
-          >Logout</v-list-item
+        <v-list-item
+          base-color="red"
+          prepend-icon="mdi-logout"
+          @click="logout()"
         >
+          <v-list-item-title>Logout</v-list-item-title>
+        </v-list-item>
       </v-list>
     </v-menu>
   </v-app-bar>

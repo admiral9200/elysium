@@ -76,7 +76,11 @@
         >
           <v-list-item-title>Help</v-list-item-title>
         </v-list-item>
-        <v-list-item color="red" prepend-icon="mdi-logout" @click="logout()">
+        <v-list-item
+          base-color="red"
+          prepend-icon="mdi-logout"
+          @click="logout()"
+        >
           <v-list-item-title>Logout</v-list-item-title>
         </v-list-item>
       </v-list>
