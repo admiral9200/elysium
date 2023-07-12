@@ -243,28 +243,12 @@ export default {
     let nfts = ref([]);
     const addCart = async (nftCollection, nftId) => {
       try {
-        const res = await axios.post("/api/cart/check", {
+        const res = await axios.post("/api/cart", {
           user_address: sessionStorage.getItem("address"),
         });
-        console.log(res);
-        if (res.data === "Cart not found") {
-          nfts.value.push({ collection: nftCollection, tokenId: nftId });
-          try {
-            await axios.post("/api/cart", {
-              user_address: sessionStorage.getItem("address"),
-              cart_content: nfts.value,
-            });
-            setAlert("success", "Successfully added to cart!");
-          } catch (err) {
-            setAlert(
-              "error",
-              "We are facing some issues please try again later..."
-            );
-            console.log(err);
-          }
-        } else {
-          nfts.value = res.data.cart_content;
-          let exist = false;
+        nfts.value = res.data;
+        let exist = false;
+        if (nfts.value.length > 0) {
           for (const element of nfts.value) {
             if (
               element.collection === nftCollection &&
@@ -276,21 +260,21 @@ export default {
               break;
             }
           }
-          if (!exist) {
-            nfts.value.push({ collection: nftCollection, tokenId: nftId });
-            try {
-              await axios.put("/api/cart", {
-                user_address: sessionStorage.getItem("address"),
-                cart_content: nfts.value,
-              });
-              setAlert("success", "Successfully added to cart!");
-            } catch (err) {
-              setAlert(
-                "error",
-                "We are facing some issues please try again later..."
-              );
-              console.log(err);
-            }
+        }
+        if (!exist) {
+          nfts.value.push({ collection: nftCollection, tokenId: nftId });
+          try {
+            await axios.put("/api/cart", {
+              user_address: sessionStorage.getItem("address"),
+              cart_content: nfts.value,
+            });
+            setAlert("success", "Successfully added to cart!");
+          } catch (err) {
+            setAlert(
+              "error",
+              "We are facing some issues please try again later..."
+            );
+            console.log(err);
           }
         }
       } catch (err) {

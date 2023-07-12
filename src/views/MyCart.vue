@@ -159,10 +159,8 @@ export default {
 
     const clearCart = async () => {
       try {
-        await axios.delete("/api/cart", {
-          data: {
-            user_address: sessionStorage.getItem("address"),
-          },
+        await axios.post("/api/cart/clear", {
+          user_address: sessionStorage.getItem("address"),
         });
         cartItems.value = [];
         setAlert("success", "Cart cleared");
@@ -186,17 +184,13 @@ export default {
 
     onMounted(async () => {
       try {
-        const res = await axios.post("/api/cart/check", {
+        const res = await axios.post("/api/cart", {
           user_address: sessionStorage.getItem("address"),
         });
-        if (
-          res.data === "Cart not found" ||
-          res.data.cart_content.length === 0
-        ) {
+        if (res.data.length === 0) {
           cartItems.value = [];
         } else {
-          cartItems.value = await getCartNFTs(res.data.cart_content);
-          console.log("cartItem", cartItems.value);
+          cartItems.value = await getCartNFTs(res.data);
         }
       } catch (error) {
         console.error(error);
