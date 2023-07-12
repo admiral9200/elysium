@@ -134,7 +134,8 @@ export default {
           username: username.value,
           address: store.account,
           email: email.value,
-          profile_url: "https://source.boringavatars.com/pixel/250",
+          profile_url:
+            "https://source.boringavatars.com/beam/250/" + username.value,
           background_url: "https://source.boringavatars.com/pixel/250",
           description: desc.value,
         };
