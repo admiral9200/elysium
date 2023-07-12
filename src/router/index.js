@@ -68,6 +68,12 @@ const routes = [
         component: () =>
           import(/* webpackChunkName: "User" */ "@/views/Admin/Collection.vue"),
       },
+      {
+        path: "platform",
+        name: "Platform",
+        component: () =>
+          import(/* webpackChunkName: "User" */ "@/views/Admin/Platform.vue"),
+      },
     ],
   },
 ];

@@ -612,6 +612,57 @@ export const useMarketStore = defineStore("user", () => {
     }
   };
 
+  const getPlatformFee = async () => {
+    if (window.ethereum) {
+      const provider = new ethers.BrowserProvider(window.ethereum);
+      const marketContract = new ethers.Contract(
+        marketContractAddress,
+        marketContractABI.abi,
+        provider
+      );
+      const fee = await marketContract.getPlatformFee();
+      return ethers.formatUnits(fee.toString(), "ether");
+    }
+  };
+
+  const getPlatformFeeRecipient = async () => {
+    if (window.ethereum) {
+      const provider = new ethers.BrowserProvider(window.ethereum);
+      const marketContract = new ethers.Contract(
+        marketContractAddress,
+        marketContractABI.abi,
+        provider
+      );
+      return await marketContract.getFeeRecipient();
+    }
+  };
+  const updatePlatformFee = async (newPlatformFee) => {
+    if (window.ethereum) {
+      const provider = new ethers.BrowserProvider(window.ethereum);
+      const signer = await provider.getSigner();
+      const marketContract = new ethers.Contract(
+        marketContractAddress,
+        marketContractABI.abi,
+        signer
+      );
+      return await marketContract.updatePlatformFee(
+        ethers.parseUnits(newPlatformFee.toString(), "ether")
+      );
+    }
+  };
+  const changeFeeRecipient = async (newFeeRecipient) => {
+    if (window.ethereum) {
+      const provider = new ethers.BrowserProvider(window.ethereum);
+      const signer = await provider.getSigner();
+      const marketContract = new ethers.Contract(
+        marketContractAddress,
+        marketContractABI.abi,
+        signer
+      );
+      return await marketContract.changeFeeRecipient(newFeeRecipient);
+    }
+  };
+
   return {
     account,
     // setLoader,
@@ -637,6 +688,10 @@ export const useMarketStore = defineStore("user", () => {
     getCartNFTs,
     buyNFT,
     checkoutNFTs,
+    getPlatformFee,
+    getPlatformFeeRecipient,
+    updatePlatformFee,
+    changeFeeRecipient,
   };
 });
 

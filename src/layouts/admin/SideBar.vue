@@ -16,6 +16,11 @@
         title="Manage Collections"
         to="/admin/collection"
       ></v-list-item>
+      <v-list-item
+        prepend-icon="mdi-cogs"
+        title="Manage Platform"
+        to="/admin/platform"
+      ></v-list-item>
     </v-list>
   </v-navigation-drawer>
 </template>
