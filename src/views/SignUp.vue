@@ -136,7 +136,10 @@ export default {
           email: email.value,
           profile_url:
             "https://source.boringavatars.com/beam/250/" + username.value,
-          background_url: "https://source.boringavatars.com/pixel/250",
+          background_url:
+            "https://source.boringavatars.com/pixel/500/" +
+            username.value +
+            "?square",
           description: desc.value,
         };
         const res = await axios.post("/api/user", data);
