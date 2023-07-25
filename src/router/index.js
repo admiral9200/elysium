@@ -19,6 +19,12 @@ const routes = [
           import(/* webpackChunkName: "MySpace" */ "@/views/MySpace.vue"),
       },
       {
+        path: "/users/",
+        name: "AllUsers",
+        component: () =>
+          import(/* webpackChunkName: "MySpace" */ "@/views/AllUsers.vue"),
+      },
+      {
         path: "/user/collection/",
         name: "MyCollection",
         component: () =>

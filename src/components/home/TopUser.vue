@@ -1,6 +1,17 @@
 <template>
   <div v-if="isExist">
-    <div class="font-weight-bold text-h4 mt-4">Most Popular Users</div>
+    <div class="mt-4 d-flex justify-space-between align-center">
+      <div class="font-weight-bold text-h4">Most Popular Users</div>
+      <v-btn
+        class="text-decoration-underline"
+        color="primary"
+        variant="text"
+        size="small"
+        to="users"
+      >
+        View All
+      </v-btn>
+    </div>
     <v-row class="mt-5" v-if="isLoading || topUsers.length">
       <v-col cols="12" md="4" v-for="item in topUsers" :key="item.address">
         <v-card class="mx-auto py-3" max-width="344" color="black">
