@@ -11,7 +11,19 @@
         :loading="loading"
         item-value="address"
         class="elevation-1"
-      ></v-data-table>
+      >
+        <template v-slot:item.actions="{ item }">
+          <v-btn
+            class="me-2"
+            color="accent"
+            variant="outlined"
+            size="small"
+            :to="'/collection/' + item.value"
+          >
+            View
+          </v-btn>
+        </template>
+      </v-data-table>
     </v-card-text>
   </v-card>
 </template>
@@ -49,6 +61,7 @@ export default {
       { title: "Royalty (%)", align: "start", key: "royalty" },
       { title: "Royalty Recipient", align: "start", key: "royaltyRecipient" },
       { title: "Follower", align: "start", key: "follower" },
+      { title: "Actions", key: "actions", sortable: false },
     ];
 
     const collections = ref([]);

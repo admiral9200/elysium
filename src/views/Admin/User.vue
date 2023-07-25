@@ -11,7 +11,19 @@
         :loading="loading"
         item-value="address"
         class="elevation-1"
-      ></v-data-table>
+      >
+        <template v-slot:item.actions="{ item }">
+          <v-btn
+            class="me-2"
+            color="accent"
+            variant="outlined"
+            size="small"
+            :to="'/user/' + item.value"
+          >
+            View
+          </v-btn>
+        </template>
+      </v-data-table>
     </v-card-text>
   </v-card>
 </template>
@@ -42,6 +54,7 @@ export default {
     const headers = [
       { title: "Name", align: "start", key: "username" },
       { title: "Address", align: "start", key: "address" },
+      { title: "Actions", key: "actions", sortable: false },
     ];
 
     const users = ref([]);
