@@ -46,6 +46,14 @@ const routes = [
             /* webpackChunkName: "CollectionPage" */ "@/views/CollectionPage.vue"
           ),
       },
+      {
+        path: "/collections/",
+        name: "AllCollections",
+        component: () =>
+          import(
+            /* webpackChunkName: "CollectionPage" */ "@/views/AllCollections.vue"
+          ),
+      },
     ],
   },
   {

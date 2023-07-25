@@ -1,6 +1,17 @@
 <template>
   <div v-if="isExist">
-    <div class="font-weight-bold text-h4 mt-4">Top Collection</div>
+    <div class="mt-4 d-flex justify-space-between align-center">
+      <div class="font-weight-bold text-h4 mt-4">Top Collection</div>
+      <v-btn
+        class="text-decoration-underline"
+        color="primary"
+        variant="text"
+        size="small"
+        to="collections"
+      >
+        View All
+      </v-btn>
+    </div>
     <v-row class="mt-5" v-if="isLoading || topCollections.length">
       <v-col
         cols="12"
