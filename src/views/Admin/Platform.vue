@@ -19,6 +19,16 @@
               :readonly="!isEditingPlatformFee"
             ></v-text-field>
           </v-col>
+          <v-col cols="3" v-if="isOwner && !isEditingPlatformFee">
+            <v-btn
+              class="mt-1"
+              color="accent"
+              variant="outlined"
+              @click="isEditingPlatformFee = true"
+            >
+              Edit
+            </v-btn>
+          </v-col>
           <v-col class="d-flex" cols="3" v-if="isEditingPlatformFee">
             <v-btn
               class="mt-1 me-2"
@@ -30,16 +40,6 @@
             </v-btn>
             <v-btn class="mt-1" color="accent" @click="updateFee()">
               Confirm
-            </v-btn>
-          </v-col>
-          <v-col cols="3" v-else>
-            <v-btn
-              class="mt-1"
-              color="accent"
-              variant="outlined"
-              @click="isEditingPlatformFee = true"
-            >
-              Edit
             </v-btn>
           </v-col>
         </v-row>
@@ -59,7 +59,21 @@
               :readonly="!isEditingPlatformFeeRecipient"
             ></v-text-field>
           </v-col>
-          <v-col class="d-flex" cols="3" v-if="isEditingPlatformFeeRecipient">
+          <v-col cols="3" v-if="isOwner && !isEditingPlatformFeeRecipient">
+            <v-btn
+              class="mt-1"
+              color="accent"
+              variant="outlined"
+              @click="isEditingPlatformFeeRecipient = true"
+            >
+              Edit
+            </v-btn>
+          </v-col>
+          <v-col
+            class="d-flex"
+            cols="3"
+            v-else-if="isEditingPlatformFeeRecipient"
+          >
             <v-btn
               class="mt-1 me-2"
               color="white"
@@ -70,16 +84,6 @@
             </v-btn>
             <v-btn class="mt-1" color="accent" @click="changeRecipient()">
               Confirm
-            </v-btn>
-          </v-col>
-          <v-col cols="3" v-else>
-            <v-btn
-              class="mt-1"
-              color="accent"
-              variant="outlined"
-              @click="isEditingPlatformFeeRecipient = true"
-            >
-              Edit
             </v-btn>
           </v-col>
         </v-row>
@@ -95,6 +99,7 @@ import { useMarketStore } from "@/stores/market";
 export default {
   setup() {
     const {
+      getOwner,
       getPlatformFee,
       getPlatformFeeRecipient,
       updatePlatformFee,
@@ -112,6 +117,8 @@ export default {
         to: "/admin/platform",
       },
     ];
+    const owner = ref("");
+    const isOwner = ref(false);
     const defaultPlatformFee = ref(0);
     const defaultPlatformFeeRecipient = ref("");
     const platformFee = ref(0);
@@ -143,6 +150,13 @@ export default {
     };
 
     onMounted(async () => {
+      owner.value = await getOwner();
+      if (
+        owner.value.toLowerCase() ===
+        sessionStorage.getItem("address").toLowerCase()
+      ) {
+        isOwner.value = true;
+      }
       defaultPlatformFee.value = await getPlatformFee();
       defaultPlatformFeeRecipient.value = await getPlatformFeeRecipient();
       platformFee.value = defaultPlatformFee.value;
@@ -155,6 +169,7 @@ export default {
       platformFeeRecipient,
       isEditingPlatformFee,
       isEditingPlatformFeeRecipient,
+      isOwner,
       cancelEditingPlatformFee,
       cancelEditingPlatformFeeRecipient,
       updateFee,

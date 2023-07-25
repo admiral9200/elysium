@@ -612,6 +612,18 @@ export const useMarketStore = defineStore("user", () => {
     }
   };
 
+  const getOwner = async () => {
+    if (window.ethereum) {
+      const provider = new ethers.BrowserProvider(window.ethereum);
+      const marketContract = new ethers.Contract(
+        marketContractAddress,
+        marketContractABI.abi,
+        provider
+      );
+      return await marketContract.owner();
+    }
+  };
+
   const getPlatformFee = async () => {
     if (window.ethereum) {
       const provider = new ethers.BrowserProvider(window.ethereum);
@@ -688,6 +700,7 @@ export const useMarketStore = defineStore("user", () => {
     getCartNFTs,
     buyNFT,
     checkoutNFTs,
+    getOwner,
     getPlatformFee,
     getPlatformFeeRecipient,
     updatePlatformFee,
