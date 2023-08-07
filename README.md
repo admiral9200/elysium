@@ -77,4 +77,4 @@ Attention: The project is still under development and is not ready for productio
 
 ## Contact
 
-email: davidbong05@gmail.com
+email: lion9200.world@gmail.com
